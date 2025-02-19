@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.png" />
+    <title>whiteboard</title>
+  </head>
+  <body>
+    <div class="action-cont">
+      <div class="actions">
+        <img
+          src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/000000/external-pencil-back-to-school-flaticons-lineal-color-flat-icons-4.png"
+        />
+        <img src="https://img.icons8.com/color-glass/48/000000/erase.png" />
+        <img src="https://img.icons8.com/fluency/48/000000/downloads.png" />
+        <img src="https://img.icons8.com/fluency/48/000000/add-image.png" />
+        <img
+          src="https://img.icons8.com/external-smashingstocks-circular-smashing-stocks/65/000000/external-note-webmobile-applications-smashingstocks-circular-smashing-stocks.png"
+        />
+        <img src="https://img.icons8.com/fluency/48/000000/redo.png" />
+        <img src="https://img.icons8.com/fluency/48/000000/undo.png" />
+        <img src="https://img.icons8.com/fluency/48/000000/broom.png" />
+      </div>
+      <div class="pencil">
+        <div class="size-bar">
+          <input type="range" min="1" max="25" value="5" />
+        </div>
+        <div class="colors">
+          <div class="red"></div>
+          <div class="blue"></div>
+          <div class="yellow"></div>
+          <div class="pink"></div>
+          <div class="green"></div>
+          <div class="black"></div>
+        </div>
+      </div>
+      <div class="eraser-cont">
+        <div class="eraser">
+          <input type="range" min="1" max="25" value="12" />
+        </div>
+      </div>
+    </div>
+    <div class="eraser-size"></div>
+    <div class="pencil-size"></div>
+    <canvas class="canvas"></canvas>
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io.connect(`http://localhost:3000`);
+      const roomId = location.pathname.slice(1);
+      socket.emit("join-room", roomId);
+    </script>
+    <script src="js/script.js"></script>
+  </body>
+</html>
