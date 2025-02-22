@@ -13,7 +13,7 @@
     <title>whiteboard</title>
   </head>
   <body>
-    <div class="action-cont">
+    <div class="action-container">
       <div class="actions">
         <img
           src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/000000/external-pencil-back-to-school-flaticons-lineal-color-flat-icons-4.png"
@@ -28,11 +28,11 @@
         <img src="https://img.icons8.com/fluency/48/000000/undo.png" />
         <img src="https://img.icons8.com/fluency/48/000000/broom.png" />
       </div>
-      <div class="pencil">
+      <div class="pencil-action">
         <div class="size-bar">
           <input type="range" min="1" max="25" value="5" />
         </div>
-        <div class="colors">
+        <div class="pencil-colors">
           <div class="red"></div>
           <div class="blue"></div>
           <div class="yellow"></div>
@@ -41,25 +41,18 @@
           <div class="black"></div>
         </div>
       </div>
-      <div class="eraser-cont">
-        <div class="eraser">
-          <input type="range" min="1" max="25" value="12" />
-        </div>
+      <div class="eraser-action">
+        <input type="range" min="1" max="25" value="12" />
       </div>
     </div>
-    <div class="eraser-size"></div>
-    <div class="pencil-size"></div>
+    <div class="eraser-size-indicator"></div>
+    <div class="pencil-size-indicator"></div>
     <canvas class="canvas"></canvas>
     <script
       src="https://cdn.socket.io/4.4.1/socket.io.min.js"
       integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
       crossorigin="anonymous"
     ></script>
-    <script>
-      const socket = io.connect(`http://localhost:3000`);
-      const roomId = location.pathname.slice(1);
-      socket.emit("join-room", roomId);
-    </script>
     <script src="js/script.js"></script>
   </body>
 </html>
