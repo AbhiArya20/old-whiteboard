@@ -1,8 +1,8 @@
-
 import express from "express";
 import { nanoid } from "nanoid";
 import path from "path";
 import { Server } from "socket.io";
+import cors from "cors"
 
 const __dirname = process.cwd();
 
