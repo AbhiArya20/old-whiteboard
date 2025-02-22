@@ -394,7 +394,7 @@ const SOCKET_ACTION = {
   UPDATE_ROOM_STATE: "update-room-state",
 }
 
-const socket = io.connect(`https://old-whiteboard.onrender.com/`);
+const socket = io.connect(`https://old-whiteboard.abhiarya.in`);
 const roomId = location.pathname.slice(1);
 
 socket.emit(SOCKET_ACTION.JOIN_ROOM, roomId);

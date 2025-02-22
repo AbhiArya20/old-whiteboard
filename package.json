@@ -16,6 +16,7 @@
   "author": "Abhishek kumar",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.3",
     "nanoid": "^5.1.0",
     "nodemon": "^2.0.15",
