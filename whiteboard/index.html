@@ -2,57 +2,97 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whiteboard - Home</title>
+    <link rel="stylesheet" href="css/style.css" />
     <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="./css/style.css" />
-    <link rel="icon" type="image/x-icon" href="./assets/favicon.png" />
-    <title>whiteboard</title>
   </head>
   <body>
-    <div class="action-container">
-      <div class="actions">
-        <img
-          src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/000000/external-pencil-back-to-school-flaticons-lineal-color-flat-icons-4.png"
-        />
-        <img src="https://img.icons8.com/color-glass/48/000000/erase.png" />
-        <img src="https://img.icons8.com/fluency/48/000000/downloads.png" />
-        <img src="https://img.icons8.com/fluency/48/000000/add-image.png" />
-        <img
-          src="https://img.icons8.com/external-smashingstocks-circular-smashing-stocks/65/000000/external-note-webmobile-applications-smashingstocks-circular-smashing-stocks.png"
-        />
-        <img src="https://img.icons8.com/fluency/48/000000/redo.png" />
-        <img src="https://img.icons8.com/fluency/48/000000/undo.png" />
-        <img src="https://img.icons8.com/fluency/48/000000/broom.png" />
+    <main class="container">
+      <div class="header fade-in">
+        <h1>
+          Start collaboration with our <br />
+          <span class="gradient-text">Whiteboard</span>
+        </h1>
+        <p>
+          Join our real-time whiteboard and start collaborating instantly with
+          users from around the world.
+        </p>
       </div>
-      <div class="pencil-action">
-        <div class="size-bar">
-          <input type="range" min="1" max="25" value="5" />
+
+      <div class="card scale-in">
+        <div class="card-content">
+          <h2>Join Server</h2>
+          <p class="subtitle">
+            Enter your username to connect to the WebSocket server
+          </p>
+
+          <div class="input-group">
+            <input
+              type="text"
+              id="username"
+              placeholder="Your username"
+              class="input"
+            />
+          </div>
+
+          <button id="connect-btn" class="button">
+            Connect <i class="fas fa-arrow-right"></i>
+          </button>
+
+          <button
+            id="disconnect-btn"
+            class="button button-destructive"
+            style="display: none"
+          >
+            Disconnect <i class="fas fa-wifi-slash"></i>
+          </button>
+
+          <div class="connection-status">
+            <div id="status-indicator" class="status-indicator"></div>
+            <span id="status-text">Not connected</span>
+            <i id="wifi-icon" class="fas fa-wifi" style="display: none"></i>
+          </div>
         </div>
-        <div class="pencil-colors">
-          <div class="red"></div>
-          <div class="blue"></div>
-          <div class="yellow"></div>
-          <div class="pink"></div>
-          <div class="green"></div>
-          <div class="black"></div>
+      </div>
+
+      <div class="features slide-up">
+        <h3>Why Join Our Server?</h3>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <h4>Real-time Communication</h4>
+            <p>
+              Exchange messages and data instantly with other users on the
+              server.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h4>Secure Connection</h4>
+            <p>All communications are encrypted and secure for your privacy.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h4>Low Latency</h4>
+            <p>
+              Experience minimal delay with our optimized WebSocket
+              implementation.
+            </p>
+          </div>
         </div>
       </div>
-      <div class="eraser-action">
-        <input type="range" min="1" max="25" value="12" />
-      </div>
-    </div>
-    <div class="eraser-size-indicator"></div>
-    <div class="pencil-size-indicator"></div>
-    <canvas class="canvas"></canvas>
-    <script
-      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
-      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
-      crossorigin="anonymous"
-    ></script>
+    </main>
+    <div id="toast-container" class="toast-container"></div>
     <script src="js/script.js"></script>
   </body>
 </html>

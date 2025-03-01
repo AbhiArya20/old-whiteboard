@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/board.css" />
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.png" />
+    <title>whiteboard</title>
+  </head>
+  <body>
+    <div class="action-container">
+      <div class="actions show">
+        <img
+          data-action="menu"
+          src="https://img.icons8.com/?size=100&id=Rdp3AydLFY2A&format=png&color=000000"
+        />
+        <img
+          data-action="pencil"
+          src="https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/000000/external-pencil-back-to-school-flaticons-lineal-color-flat-icons-4.png"
+        />
+        <img
+          data-action="shape"
+          src="https://img.icons8.com/?size=100&id=ACkUsxlz9rRP&format=png&color=000000"
+        />
+        <img
+          data-action="eraser"
+          src="https://img.icons8.com/color-glass/48/000000/erase.png"
+        />
+        <img
+          data-action="download"
+          src="https://img.icons8.com/fluency/48/000000/downloads.png"
+        />
+        <img
+          data-action="image"
+          src="https://img.icons8.com/fluency/48/000000/add-image.png"
+        />
+        <img
+          data-action="note"
+          src="https://img.icons8.com/external-smashingstocks-circular-smashing-stocks/65/000000/external-note-webmobile-applications-smashingstocks-circular-smashing-stocks.png"
+        />
+        <img
+          data-action="undo"
+          src="https://img.icons8.com/fluency/48/000000/redo.png"
+        />
+        <img
+          data-action="redo"
+          src="https://img.icons8.com/fluency/48/000000/undo.png"
+        />
+        <img
+          data-action="clear"
+          src="https://img.icons8.com/fluency/48/000000/broom.png"
+        />
+      </div>
+      <div class="pencil-action">
+        <div class="pencil-size">
+          <span>Size</span>
+          <div class="pencil-size-input-wrapper">
+            <input type="range" min="2" max="30" value="5" />
+            <div class="pencil-size-indicator background-highlight">
+              <span></span>
+            </div>
+          </div>
+        </div>
+        <div class="pencil-color-options">
+          <span>Color</span>
+          <div class="pencil-colors">
+            <div class="red"></div>
+            <div class="blue"></div>
+            <div class="skyblue"></div>
+            <div class="orange"></div>
+            <div class="pink"></div>
+            <div class="lightgreen"></div>
+            <div class="black"></div>
+            <input type="color" class="pencil-color-input" />
+          </div>
+        </div>
+      </div>
+      <div class="shape-action">
+        <div class="shape-size">
+          <span>Size</span>
+          <div class="shape-size-input-wrapper">
+            <input type="range" min="2" max="30" value="5" />
+            <div class="shape-size-indicator background-highlight">
+              <span></span>
+            </div>
+          </div>
+        </div>
+        <div class="shape-shape-option">
+          <span>Shapes</span>
+          <div class="shape-action-icons">
+            <img
+              data-shape="text"
+              src="https://img.icons8.com/?size=100&id=78858&format=png&color=000000"
+            />
+            <img
+              data-shape="rectangle"
+              src="https://img.icons8.com/?size=100&id=5K4oxA44snwu&format=png&color=000000"
+            />
+            <img
+              data-shape="circle"
+              src="https://img.icons8.com/?size=100&id=37601&format=png&color=000000"
+            />
+            <img
+              data-shape="line"
+              src="https://img.icons8.com/?size=100&id=8143&format=png&color=000000"
+            />
+            <img
+              data-shape="arrow"
+              style="rotate: -90deg"
+              src="https://img.icons8.com/?size=100&id=43830&format=png&color=000000"
+            />
+            <img
+              data-shape="rhombus"
+              src="https://img.icons8.com/?size=100&id=98449&format=png&color=000000"
+            />
+            <img
+              data-shape="triangle"
+              src="https://img.icons8.com/?size=100&id=98498&format=png&color=000000"
+            />
+            <img
+              data-shape="star"
+              src="https://img.icons8.com/?size=100&id=EZ5j1vem6LAO&format=png&color=000000"
+            />
+          </div>
+        </div>
+        <div class="shape-color-options">
+          <span>Color</span>
+          <div class="shape-colors">
+            <div class="red"></div>
+            <div class="blue"></div>
+            <div class="skyblue"></div>
+            <div class="orange"></div>
+            <div class="pink"></div>
+            <div class="lightgreen"></div>
+            <div class="black"></div>
+            <input type="color" class="shape-color-input" />
+          </div>
+        </div>
+      </div>
+      <div class="eraser-action">
+        <div class="eraser-size">
+          <span>Size</span>
+          <div class="eraser-size-input-wrapper">
+            <input type="range" min="2" max="30" value="10" />
+            <div class="eraser-size-indicator background-highlight">
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="zoom-actions">
+      <div class="zoom-out">
+        <img
+          src="https://img.icons8.com/?size=100&id=79029&format=png&color=000000"
+        />
+      </div>
+      <div class="zoom-value">100%</div>
+      <div class="zoom-in">
+        <img
+          src="https://img.icons8.com/?size=100&id=62888&format=png&color=000000"
+        />
+      </div>
+    </div>
+    <canvas class="canvas"></canvas>
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/board.js" type="module"></script>
+  </body>
+</html>
