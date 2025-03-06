@@ -44,8 +44,8 @@ export class Actions {
         } else {
             this.#reset();
             event.target.classList.add("background-highlight");
-            this.#eraser.close();
             this.#shape.close();
+            this.#eraser.close();
             this.#pencil.open();
         }
 
@@ -75,7 +75,7 @@ export class Actions {
         }
     }
 
-    #handleDownload = (event) => {
+    #handleDownload = () => {
         const imageURL = this.#canvas.toDataURL();
         const a = document.createElement("a");
         a.href = imageURL;

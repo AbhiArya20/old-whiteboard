@@ -19,6 +19,7 @@ export class Pencil {
 
         const pencilColorStorageKey = "pencil-color";
         this.#color = localStorage.getItem(pencilColorStorageKey) ?? colors.children[0].classList[0];
+        pencilSizeIndicator.style.backgroundColor = this.#color;
         let isContained = false;
         for (let children of colors.children) {
             if (children.classList.contains(this.#color)) {
@@ -32,7 +33,7 @@ export class Pencil {
             pencilColorPicker.style.border = "solid 3px salmon";
         }
 
-        pencilColorPicker.onchange = (event) => {
+        pencilColorPicker.oninput = (event) => {
             this.#color = event.target.value;
             localStorage.setItem(pencilColorStorageKey, this.#color);
             pencilSizeIndicator.style.backgroundColor = this.#color;
@@ -62,8 +63,7 @@ export class Pencil {
         this.#size = localStorage.getItem(pencilSizeStorageKey) ?? pencilSizeInput.value;
         pencilSizeInput.value = this.#size;
         pencilSizeIndicator.style.height = `${this.#size}px`;
-        pencilSizeIndicator.style.backgroundColor = this.#color;
-        pencilSizeInput.onchange = (e) => {
+        pencilSizeInput.oninput = (e) => {
             this.#size = e.target.value;
             localStorage.setItem(pencilSizeStorageKey, this.#size);
             pencilSizeIndicator.style.height = `${this.#size}px`;
@@ -82,17 +82,17 @@ export class Pencil {
         this.#isDialogOpen = false;
     }
 
-    openDialog() {
+    openDialog = () => {
         this.#pencil.classList.add("show");
         this.#isDialogOpen = true;
     }
 
-    closeDialog() {
+    closeDialog = () => {
         this.#pencil.classList.remove("show");
         this.#isDialogOpen = false;
     }
 
-    toggleDialog() {
+    toggleDialog = () => {
         if (this.#isDialogOpen) {
             this.closeDialog();
         } else {

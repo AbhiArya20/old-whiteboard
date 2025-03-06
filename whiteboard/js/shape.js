@@ -34,7 +34,7 @@ export class Shape {
         this.#size = localStorage.getItem(shapeSizeStorageKey) ?? shapeSizeInput.value;
         shapeSizeInput.value = this.#size;
         shapeSizeIndicator.style.height = `${this.#size}px`;
-        shapeSizeInput.onchange = (e) => {
+        shapeSizeInput.oninput = (e) => {
             this.#size = e.target.value;
             localStorage.setItem(shapeSizeStorageKey, this.#size);
             shapeSizeIndicator.style.height = `${this.#size}px`;
@@ -56,15 +56,15 @@ export class Shape {
             shapeColorPicker.style.border = "solid 3px salmon";
         }
 
-        shapeColorPicker.onchange = (event) => {
-            this.color = event.target.value;
-            localStorage.setItem(shapeColorStorageKey, this.color);
-            shapeSizeIndicator.style.backgroundColor = this.color;
+        shapeColorPicker.oninput = (event) => {
+            this.#color = event.target.value;
+            localStorage.setItem(shapeColorStorageKey, this.#color);
+            shapeSizeIndicator.style.backgroundColor = this.#color;
             for (let children of colors.children) {
                 children.style.border = "solid 3px transparent";
             }
             shapeColorPicker.style.border = "solid 3px salmon";
-            shapeColorPicker.style.backgroundColor = this.color;
+            shapeColorPicker.style.backgroundColor = this.#color;
         };
 
         colors.addEventListener("click", (event) => {
@@ -72,9 +72,9 @@ export class Shape {
             if (event.target === colors) return;
 
             const selectedColorElement = event.target;
-            this.color = selectedColorElement.classList[0];
-            localStorage.setItem(shapeColorStorageKey, this.color);
-            shapeSizeIndicator.style.backgroundColor = this.color;
+            this.#color = selectedColorElement.classList[0];
+            localStorage.setItem(shapeColorStorageKey, this.#color);
+            shapeSizeIndicator.style.backgroundColor = this.#color;
             for (let children of colors.children) {
                 children.style.border = "solid 3px transparent";
             }
@@ -94,17 +94,17 @@ export class Shape {
         this.#isDialogOpen = false;
     }
 
-    openDialog() {
+    openDialog = () => {
         this.#shape.classList.add("show");
         this.#isDialogOpen = true;
     }
 
-    closeDialog() {
+    closeDialog = () => {
         this.#shape.classList.remove("show");
         this.#isDialogOpen = false;
     }
 
-    toggleDialog() {
+    toggleDialog = () => {
         if (this.#isDialogOpen) {
             this.closeDialog();
         } else {
