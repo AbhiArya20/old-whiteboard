@@ -9,6 +9,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon" />
   </head>
   <body>
     <main class="container">
@@ -23,44 +24,70 @@
         </p>
       </div>
 
-      <div class="card scale-in">
-        <div class="card-content">
-          <h2>Join Server</h2>
-          <p class="subtitle">
-            Enter your username to connect to the WebSocket server
-          </p>
+      <div class="cards-container">
+        <!-- Create Room Card -->
+        <div class="card scale-in">
+          <div class="card-content">
+            <h2>Create Room</h2>
+            <p class="subtitle">
+              Start a new whiteboard session and invite participants to join.
+            </p>
 
-          <div class="input-group">
-            <input
-              type="text"
-              id="username"
-              placeholder="Your username"
-              class="input"
-            />
+            <div class="input-group">
+              <input
+                type="text"
+                id="roomName"
+                placeholder="Room name (optional)"
+                class="input"
+              />
+            </div>
+
+            <button id="create-btn" class="button">
+              Create Room <i class="fa-plus fas"></i>
+            </button>
+
+            <div class="note">
+              <div id="note-indicator" class="note-indicator"></div>
+              <span id="note-text"
+                >A unique room ID will be generated automatically</span
+              >
+            </div>
           </div>
+        </div>
 
-          <button id="connect-btn" class="button">
-            Connect <i class="fa-arrow-right fas"></i>
-          </button>
+        <!-- Join Room Card -->
+        <div class="card scale-in">
+          <div class="card-content">
+            <h2>Join Room</h2>
+            <p class="subtitle">
+              Enter a room ID or connection link to join an existing whiteboard
+            </p>
 
-          <button
-            id="disconnect-btn"
-            class="button button-destructive"
-            style="display: none"
-          >
-            Disconnect <i class="fa-wifi-slash fas"></i>
-          </button>
+            <div class="input-group">
+              <input
+                type="text"
+                id="roomId"
+                placeholder="Room ID or connection link"
+                class="input"
+              />
+            </div>
 
-          <div class="connection-status">
-            <div id="status-indicator" class="status-indicator"></div>
-            <span id="status-text">Not connected</span>
-            <i id="wifi-icon" class="fa-wifi fas" style="display: none"></i>
+            <button id="join-btn" class="button">
+              Join Room <i class="fa-arrow-right fas"></i>
+            </button>
+
+            <div class="note">
+              <div id="note-indicator" class="note-indicator"></div>
+              <span id="note-text"
+                >We will generated a unique user ID for you</span
+              >
+            </div>
           </div>
         </div>
       </div>
 
       <div class="features slide-up">
-        <h3>Why Join Our Server?</h3>
+        <h3>Why Join Our whiteboard?</h3>
         <div class="feature-grid">
           <div class="feature-card">
             <div class="feature-icon">
@@ -68,8 +95,8 @@
             </div>
             <h4>Real-time Communication</h4>
             <p>
-              Exchange messages and data instantly with other users on the
-              server.
+              Exchange ideas instantly with other users faster than ever and
+              collaborate on projects together.
             </p>
           </div>
           <div class="feature-card">
@@ -77,7 +104,10 @@
               <i class="fa-lock fas"></i>
             </div>
             <h4>Secure Connection</h4>
-            <p>All communications are encrypted and secure for your privacy.</p>
+            <p>
+              All communications are encrypted and secure for your privacy and
+              nothing is stored on our servers.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -86,13 +116,13 @@
             <h4>Low Latency</h4>
             <p>
               Experience minimal delay with our optimized WebSocket
-              implementation.
+              implementation with low latency.
             </p>
           </div>
         </div>
       </div>
     </main>
     <div id="toast-container" class="toast-container"></div>
-    <script src="js/script.js"></script>
+    <script src="./js/script.js"></script>
   </body>
 </html>

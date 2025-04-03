@@ -94,7 +94,14 @@ p {
   font-size: 1.125rem;
 }
 
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .card {
+  min-width: 15rem;
   max-width: 28rem;
   margin: 0 auto 4rem;
   background: var(--card-bg);
@@ -175,7 +182,7 @@ p {
   background: #dc2626;
 }
 
-.connection-status {
+.note {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,7 +190,7 @@ p {
   font-size: 0.875rem;
 }
 
-.status-indicator {
+.note-indicator {
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
@@ -192,18 +199,14 @@ p {
   animation: pulse 2s infinite;
 }
 
-.status-indicator.connected {
+.note-indicator.connected {
   background-color: var(--success-color);
-}
-
-#wifi-icon {
-  color: var(--success-color);
-  margin-left: 0.5rem;
 }
 
 .features {
   text-align: center;
   margin-top: 4rem;
+  cursor: pointer;
 }
 
 .feature-grid {
