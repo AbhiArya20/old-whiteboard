@@ -7,6 +7,8 @@ const __dirname = process.cwd();
 
 const app = express();
 
+app.use(express.json());
+
 class Stack {
   #stack;
   #size;
@@ -46,27 +48,44 @@ class Stack {
   }
 }
 
+const roomIds = new Set();
+const roomId_name = new Map();
 const roomState = new Map();
 const roomId_userId = new Map();
-const roomIds = new Set();
 const socketId_roomId_userId = new Map();
 
 app.get("/", (req, res) => {
   return res.sendFile(path.join(__dirname, "whiteboard", "index.html"));
 });
 
-app.get("/create", function (req, res) {
+app.post("/create", function (req, res) {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({
+      message: "Room name required",
+      description: "Please enter a room name to create",
+    });
+  }
+
   try {
     const id = nanoid();
     while (roomIds.has(id)) {
       id = nanoid();
     }
     roomIds.add(id);
+    roomId_name.set(id, name);
     roomState.set(id, new Map());
     roomId_userId.set(id, new Set());
-    return res.status(201).json({ id });
+    return res.status(201).json({
+      id,
+      message: "Room created successfully",
+      description: "Joining...",
+    });
   } catch (e) {
-    return res.sendFile(path.join(__dirname + "/whiteboard/not-found.html"));
+    return res.status(500).json({
+      message: "Something went wrong",
+      description: "Please try again later or contact support",
+    });
   }
 });
 

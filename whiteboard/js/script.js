@@ -17,7 +17,7 @@ function showToast(title, message, type = "success") {
   }, 5000);
 }
 
-createBtn.addEventListener("click", () => {
+createBtn.addEventListener("click", async () => {
   const name = roomName.value.trim();
 
   if (!name) {
@@ -30,35 +30,34 @@ createBtn.addEventListener("click", () => {
   }
 
   try {
-    const res = fetch("/create", {
+    const res = await fetch("/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ name }),
     });
-    if (res.status === 201) {
-      showToast("Room created successfully", "You can now join the room");
-    } else {
-      showToast(
-        "Something went wrong",
-        "Please try again later or contact support",
-        "error"
-      );
+
+    const { id, message, description } = await res.json();
+
+    showToast(message, description, !res.ok ? "error" : "success");
+
+    if (res.ok) {
+      window.location.assign(id);
     }
   } catch (e) {
+    console.log(e);
+
     showToast(
       "Unable to connect to the server",
       "Check your internet connection and try again",
       "error"
     );
-    return;
   }
 });
 
 joinBtn.addEventListener("click", () => {
   let id = roomId.value.trim();
-
   try {
     const url = new URL(id);
     id = url.pathname.split("/").pop();
@@ -78,4 +77,5 @@ joinBtn.addEventListener("click", () => {
     );
     return;
   }
+  window.location.assign(id);
 });
