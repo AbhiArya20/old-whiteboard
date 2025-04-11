@@ -1,26 +1,27 @@
-import { MOUSE_BUTTON, SOCKET_ACTION, SHAPES } from "./enums.js"
-import { nanoid } from "./nanoid.js";
-import { IndexedDB } from "./indexed-db.js";
-import { Stack } from "./stack.js";
-import { Actions } from "./action.js";
-import { Eraser } from "./eraser.js";
-import { Pencil } from "./pencil.js"
-import { Shape } from "./shape.js";
+import { MOUSE_BUTTON, SOCKET_ACTION, SHAPES } from "./js/ui/enums.js";
+import { nanoid } from "./js/nanoid.js";
+import { IndexedDB } from "./js/ui/indexed-db.js";
+import { Stack } from "./js/ui/stack.js";
+import { Actions } from "./js/ui/action.js";
+import { Eraser } from "./js/ui/eraser.js";
+import { Pencil } from "./js/ui/pencil.js";
+import { Shape } from "./js/ui/shape.js";
+import { Stage } from "./js/drawing/stage.js";
 
 // Remove context menu
 document.oncontextmenu = () => {
   return false;
-}
+};
 
 // Get userId
-const userIdStorageKey = "user-id"
+const userIdStorageKey = "user-id";
 const userId = localStorage.getItem(userIdStorageKey) ?? nanoid();
 
 // Open Database Connection
-const db = new IndexedDB('whiteboard', 'actions');
+const db = new IndexedDB("whiteboard", "actions");
 
 try {
-  await db.openDatabase()
+  await db.openDatabase();
 } catch (err) {
   console.log(err);
 }
@@ -42,13 +43,12 @@ class Freehand {
     this.#tool.strokeStyle = this.#state.color;
     this.#tool.lineWidth = this.#state.lineWidth;
     this.#tool.stroke();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Text {
   #state;
@@ -64,13 +64,12 @@ class Text {
     this.#tool.font = `${this.#state.fontSize}px ${this.#state.fontFamily}`;
     this.#tool.fillStyle = this.#state.color;
     this.#tool.fillText(this.#state.text, this.#state.X, this.#state.Y);
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Rectangle {
   #tool;
@@ -84,14 +83,18 @@ class Rectangle {
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
     this.#tool.fillStyle = this.#state.color;
-    this.#tool.fillRect(this.#state.X, this.#state.Y, this.#state.width, this.#state.height);
-  }
+    this.#tool.fillRect(
+      this.#state.X,
+      this.#state.Y,
+      this.#state.width,
+      this.#state.height
+    );
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Circle {
   #state;
@@ -105,16 +108,21 @@ class Circle {
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
     this.#tool.beginPath();
-    this.#tool.arc(this.#state.X, this.#state.Y, this.#state.radius, 0, 2 * Math.PI);
+    this.#tool.arc(
+      this.#state.X,
+      this.#state.Y,
+      this.#state.radius,
+      0,
+      2 * Math.PI
+    );
     this.#tool.fillStyle = this.#state.color;
     this.#tool.fill();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Line {
   #state;
@@ -133,13 +141,12 @@ class Line {
     this.#tool.strokeStyle = this.#state.color;
     this.#tool.lineWidth = this.#state.lineWidth;
     this.#tool.stroke();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Arrow {
   #state;
@@ -152,7 +159,10 @@ class Arrow {
 
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
-    const angle = Math.atan2(this.#state.endY - this.#state.startY, this.#state.endX - this.#state.startX);
+    const angle = Math.atan2(
+      this.#state.endY - this.#state.startY,
+      this.#state.endX - this.#state.startX
+    );
     const arrowSize = this.#state.arrowSize || 10;
 
     this.#tool.beginPath();
@@ -175,13 +185,12 @@ class Arrow {
       this.#state.endY - arrowSize * Math.sin(angle + Math.PI / 6)
     );
     this.#tool.stroke();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Triangle {
   #state;
@@ -198,18 +207,23 @@ class Triangle {
 
     this.#tool.beginPath();
     this.#tool.moveTo(this.#state.X, this.#state.Y); // Starting point (top vertex)
-    this.#tool.lineTo(this.#state.X - halfBase, this.#state.Y + this.#state.height); // Left vertex
-    this.#tool.lineTo(this.#state.X + halfBase, this.#state.Y + this.#state.height); // Right vertex
+    this.#tool.lineTo(
+      this.#state.X - halfBase,
+      this.#state.Y + this.#state.height
+    ); // Left vertex
+    this.#tool.lineTo(
+      this.#state.X + halfBase,
+      this.#state.Y + this.#state.height
+    ); // Right vertex
     this.#tool.closePath();
     this.#tool.fillStyle = this.#state.color;
     this.#tool.fill();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
 
 class Star {
   #state;
@@ -243,25 +257,21 @@ class Star {
     this.#tool.closePath();
     this.#tool.fillStyle = color;
     this.#tool.fill();
-  }
+  };
 
   getState = () => {
     return this.#state;
-  }
+  };
 }
-
-
-
-
 
 class Canvas {
   #roomState;
 
-  #actionContainer
+  #actionContainer;
 
   #body;
 
-  #prevClick
+  #prevClick;
 
   #prevTouches;
   #touchCount;
@@ -269,7 +279,7 @@ class Canvas {
   #canvas;
   #tool;
 
-  #rectangle
+  #rectangle;
 
   #mouseButton;
   #drawingState;
@@ -287,14 +297,14 @@ class Canvas {
   #isDrawing;
   #isDrawingCleared;
 
-  #pencil
-  #shape
+  #pencil;
+  #shape;
   #eraser;
   #db;
   #socket;
   #zoom;
 
-  #roomId
+  #roomId;
 
   constructor(options) {
     const SocketURL = `${location.protocol}//${location.host}`;
@@ -334,18 +344,18 @@ class Canvas {
     this.#prevTouches = [null, null];
     this.#touchCount = 0;
 
-
     // Event Listeners
     this.#canvas.addEventListener("mousedown", this.#startDrawing);
     this.#canvas.addEventListener("mousemove", this.#drawing);
     this.#canvas.addEventListener("mouseup", this.#endDrawing);
-    this.#canvas.addEventListener('mouseout', this.#endDrawing);
-    this.#canvas.addEventListener('wheel', this.#onMouseWheel);
+    this.#canvas.addEventListener("mouseout", this.#endDrawing);
+    this.#canvas.addEventListener("wheel", this.#onMouseWheel);
     this.#canvas.addEventListener("touchstart", this.#startDrawingTouch);
-    this.#canvas.addEventListener("touchmove", this.#drawingTouch, { passive: true });
+    this.#canvas.addEventListener("touchmove", this.#drawingTouch, {
+      passive: true,
+    });
     this.#canvas.addEventListener("touchend", this.#endDrawingTouch);
-    this.#canvas.addEventListener('touchcancel', this.#endDrawingTouch);
-
+    this.#canvas.addEventListener("touchcancel", this.#endDrawingTouch);
 
     // Draw the canvas from local indexedDB.
     (async () => {
@@ -365,45 +375,48 @@ class Canvas {
       this.#redrawCanvas();
     });
 
-    this.#socket.emit(SOCKET_ACTION.JOIN_ROOM, { userId, roomId: this.#roomId, state: this.#roomState.get(userId).state() });
+    this.#socket.emit(SOCKET_ACTION.JOIN_ROOM, {
+      userId,
+      roomId: this.#roomId,
+      state: this.#roomState.get(userId).state(),
+    });
 
     this.#socket.on(SOCKET_ACTION.JOIN_ROOM, (data) => {
       const stack = new Stack();
       if (data.stack && data.stack.length) {
         stack.push(...data.state);
       }
-      this.#roomState.set(data.userId, stack)
-      this.#redrawCanvas()
+      this.#roomState.set(data.userId, stack);
+      this.#redrawCanvas();
     });
 
     this.#socket.on(SOCKET_ACTION.JOINED_USER_STATE, (data) => {
-      data.forEach(userState => {
+      data.forEach((userState) => {
         const stack = new Stack();
-        stack.push(...userState.state)
-        this.#roomState.set(userState.userId, stack)
+        stack.push(...userState.state);
+        this.#roomState.set(userState.userId, stack);
       });
       this.#redrawCanvas();
-    })
+    });
 
     // Draw lines when other connected user draws anything.
     this.#socket.on(SOCKET_ACTION.CANVAS_UPDATE, (data) => {
       this.#drawStroke(data);
-    })
+    });
 
     // Update indexedDB when other connected user completes its one drawing.
     this.#socket.on(SOCKET_ACTION.UPDATE_ROOM_STATE, async (data) => {
       try {
-        this.#roomState.set(data.userId, new Stack(...data.state))
+        this.#roomState.set(data.userId, new Stack(...data.state));
         await this.#db.saveData(data.state);
       } catch (err) {
         console.log(err);
       }
-    })
+    });
 
     this.#socket.on(SOCKET_ACTION.CANVAS_CLEAR, () => {
       this.clear();
-    })
-
+    });
   }
 
   // Function to detect which mouse button is clicked.
@@ -418,7 +431,7 @@ class Canvas {
       default:
         return MOUSE_BUTTON.NONE;
     }
-  }
+  };
 
   #startDrawingTouch = (event) => {
     this.#pencil.close();
@@ -426,10 +439,10 @@ class Canvas {
     this.#touchCount = event.touches.length;
     this.#prevTouches[0] = event.touches[0];
     this.#prevTouches[1] = event.touches[1];
-  }
+  };
 
   #drawingTouch = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     const touch0X = event.touches[0].pageX;
     const touch0Y = event.touches[0].pageY;
     const prevTouch0X = this.#prevTouches[0].pageX;
@@ -446,11 +459,15 @@ class Canvas {
         Y0: prevTouch0Y,
         X1: touch0X,
         Y1: touch0Y,
-        color: this.#eraser.getState().isSelected ? this.#eraser.getState().color : this.#pencil.getState().color,
-        width: this.#eraser.getState().isSelected ? this.#eraser.getState().size : this.#pencil.getState().size
-      }
+        color: this.#eraser.getState().isSelected
+          ? this.#eraser.getState().color
+          : this.#pencil.getState().color,
+        width: this.#eraser.getState().isSelected
+          ? this.#eraser.getState().size
+          : this.#pencil.getState().size,
+      };
 
-      // Drawing 
+      // Drawing
       this.#drawStroke(data);
 
       // Storing drawing state to update indexedDB and send to others user
@@ -460,10 +477,25 @@ class Canvas {
       this.#drawingState.type = "freehand";
       this.#drawingState.color = data.color;
       this.#drawingState.width = data.width;
-      this.#drawingState.points.push({ X0: prevScaledX, Y0: prevScaledY, X1: scaledX, Y1: scaledY });
+      this.#drawingState.points.push({
+        X0: prevScaledX,
+        Y0: prevScaledY,
+        X1: scaledX,
+        Y1: scaledY,
+      });
 
       // Emit current drawing points.
-      this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, { X0: prevScaledX, Y0: prevScaledY, X1: scaledX, Y1: scaledY, type: this.#drawingState.type, color: this.#drawingState.color, width: this.#drawingState.width, roomId: this.#drawingState.roomId, userId: this.#drawingState.userId })
+      this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, {
+        X0: prevScaledX,
+        Y0: prevScaledY,
+        X1: scaledX,
+        Y1: scaledY,
+        type: this.#drawingState.type,
+        color: this.#drawingState.color,
+        width: this.#drawingState.width,
+        roomId: this.#drawingState.roomId,
+        userId: this.#drawingState.userId,
+      });
 
       this.#isDrawing = true;
       this.#isDrawingCleared = false;
@@ -483,7 +515,7 @@ class Canvas {
       );
       const prevHypot = Math.sqrt(
         Math.pow(prevTouch0X - prevTouch1X, 2) +
-        Math.pow(prevTouch0Y - prevTouch1Y, 2)
+          Math.pow(prevTouch0Y - prevTouch1Y, 2)
       );
 
       const zoomAmount = hypot / prevHypot;
@@ -508,14 +540,14 @@ class Canvas {
       this.#offsetX += unitsAddLeft;
       this.#offsetY += unitsAddTop;
 
-      this.#socket.emit("touchstart", "Running")
+      this.#socket.emit("touchstart", "Running");
 
       redrawCanvas();
     }
 
     this.#prevTouches[0] = event.touches[0];
     this.#prevTouches[1] = event.touches[1];
-  }
+  };
 
   #endDrawingTouch = (event) => {
     this.#actionContainer.classList.remove("pointer-none");
@@ -531,11 +563,11 @@ class Canvas {
       console.log(err);
     }
 
-    this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, this.#drawingState)
+    this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, this.#drawingState);
 
     this.#isDrawing = false;
     this.#drawingState = { points: [] };
-  }
+  };
 
   #startDrawing = (event) => {
     this.#pencil.closeDialog();
@@ -545,7 +577,6 @@ class Canvas {
     this.#mouseButton = this.#getClickedMouse(event);
     if (this.#mouseButton === MOUSE_BUTTON.RIGHT) return;
     // console.log(Date.now() - this.#prevClick);
-
 
     // if (this.#mouseButton === MOUSE_BUTTON.LEFT && this.#prevClick && !this.#isDrawing && Date.now() - this.#prevClick < 400) {
     //   console.log("Double clicks");
@@ -562,15 +593,24 @@ class Canvas {
 
     console.log(this.#shape.getState().color);
 
-
-    if (this.#mouseButton === MOUSE_BUTTON.LEFT && this.#shape.getState().isSelected && this.#shape.getState().selectedShape === SHAPES.RECTANGLE) {
-      this.#rectangle = new Rectangle(this.#tool, this.#redrawCanvas, { X: this.#cursorX, Y: this.#cursorY, width: 0, height: 0, color: this.#shape.getState().color })
+    if (
+      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      this.#shape.getState().isSelected &&
+      this.#shape.getState().selectedShape === SHAPES.RECTANGLE
+    ) {
+      this.#rectangle = new Rectangle(this.#tool, this.#redrawCanvas, {
+        X: this.#cursorX,
+        Y: this.#cursorY,
+        width: 0,
+        height: 0,
+        color: this.#shape.getState().color,
+      });
     }
 
     if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
-      this.#body.style.cursor = "grab"
+      this.#body.style.cursor = "grab";
     }
-  }
+  };
 
   #drawing = (event) => {
     const touch = (event.touches || [])[0] || event;
@@ -588,18 +628,15 @@ class Canvas {
       this.#offsetY += (this.#cursorY - this.#prevCursorY) / this.#scale;
       this.#redrawCanvas();
     } else if (this.#mouseButton === MOUSE_BUTTON.LEFT) {
-
-
-
       if (this.#shape.getState().isSelected) {
         const selectedShape = this.#shape.getState().selectedShape;
         if (selectedShape === "rectangle") {
           const data = {
             width: this.#cursorX - this.#rectangle.getState().X,
-            height: this.#cursorY - this.#rectangle.getState().Y
-          }
+            height: this.#cursorY - this.#rectangle.getState().Y,
+          };
 
-          this.#rectangle.draw(data)
+          this.#rectangle.draw(data);
         }
       } else {
         const data = {
@@ -607,12 +644,15 @@ class Canvas {
           Y0: this.#prevCursorY,
           X1: this.#cursorX,
           Y1: this.#cursorY,
-          color: this.#eraser.getState().isSelected ? this.#eraser.getState().color : this.#pencil.getState().color,
-          width: (this.#eraser.getState().isSelected ? this.#eraser.getState().size : this.#pencil.getState().size)
-        }
+          color: this.#eraser.getState().isSelected
+            ? this.#eraser.getState().color
+            : this.#pencil.getState().color,
+          width: this.#eraser.getState().isSelected
+            ? this.#eraser.getState().size
+            : this.#pencil.getState().size,
+        };
 
         this.#drawStroke(data);
-
 
         this.#drawingState.userId = userId;
         this.#drawingState.roomId = this.#roomId;
@@ -621,9 +661,24 @@ class Canvas {
         this.#drawingState.color = data.color;
         this.#drawingState.width = data.width;
         this.#drawingState.scale = this.#scale;
-        this.#drawingState.points.push({ X0: prevScaledX, Y0: prevScaledY, X1: scaledX, Y1: scaledY });
+        this.#drawingState.points.push({
+          X0: prevScaledX,
+          Y0: prevScaledY,
+          X1: scaledX,
+          Y1: scaledY,
+        });
 
-        this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, { X0: prevScaledX, Y0: prevScaledY, X1: scaledX, Y1: scaledY, type: this.#drawingState.type, color: this.#drawingState.color, width: this.#drawingState.width, roomId: this.#drawingState.roomId, userId: this.#drawingState.userId })
+        this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, {
+          X0: prevScaledX,
+          Y0: prevScaledY,
+          X1: scaledX,
+          Y1: scaledY,
+          type: this.#drawingState.type,
+          color: this.#drawingState.color,
+          width: this.#drawingState.width,
+          roomId: this.#drawingState.roomId,
+          userId: this.#drawingState.userId,
+        });
 
         this.#isDrawing = true;
         this.#isDrawingCleared = false;
@@ -631,7 +686,7 @@ class Canvas {
     }
     this.#prevCursorX = this.#cursorX;
     this.#prevCursorY = this.#cursorY;
-  }
+  };
 
   #endDrawing = (event) => {
     this.#actionContainer.classList.remove("pointer-none");
@@ -648,12 +703,11 @@ class Canvas {
       console.log(err);
     }
 
-    this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, this.#drawingState)
+    this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, this.#drawingState);
 
     this.#isDrawing = false;
     this.#drawingState = { points: [] };
-
-  }
+  };
 
   #redrawCanvas() {
     const state = this.#roomState.get(userId).state();
@@ -663,7 +717,7 @@ class Canvas {
       if (userState && userState.length) {
         state.push(...userState);
       }
-    })
+    });
 
     this.#canvas.width = document.body.clientWidth;
     this.#canvas.height = document.body.clientHeight;
@@ -671,29 +725,41 @@ class Canvas {
     this.#clear();
     // (this.#scale >= 1 ? line.width * this.#scale : line.width * this.#scale)
 
-
     for (let line of state) {
       for (let point of line.points) {
-        this.#drawStroke({ X0: this.#toScreenX(point.X0), Y0: this.#toScreenY(point.Y0), color: line.color, width: (this.#scale <= line.width ? line.width * this.#scale : line.width), X1: this.#toScreenX(point.X1), Y1: this.#toScreenY(point.Y1) })
+        this.#drawStroke({
+          X0: this.#toScreenX(point.X0),
+          Y0: this.#toScreenY(point.Y0),
+          color: line.color,
+          width:
+            this.#scale <= line.width ? line.width * this.#scale : line.width,
+          X1: this.#toScreenX(point.X1),
+          Y1: this.#toScreenY(point.Y1),
+        });
       }
     }
   }
 
   #drawStroke = (options) => {
-    this.#tool.beginPath()
-    this.#tool.moveTo(options.X0, options.Y0)
-    this.#tool.lineTo(options.X1, options.Y1)
-    this.#tool.strokeStyle = options.color
-    this.#tool.lineWidth = options.width
-    this.#tool.lineCap = "round"
-    this.#tool.lineJoin = "round"
-    this.#tool.stroke()
-  }
+    this.#tool.beginPath();
+    this.#tool.moveTo(options.X0, options.Y0);
+    this.#tool.lineTo(options.X1, options.Y1);
+    this.#tool.strokeStyle = options.color;
+    this.#tool.lineWidth = options.width;
+    this.#tool.lineCap = "round";
+    this.#tool.lineJoin = "round";
+    this.#tool.stroke();
+  };
 
   #clear = () => {
-    this.#tool.fillStyle = 'white';
-    this.#tool.fillRect(0, 0, document.body.clientWidth, document.body.clientHeight);
-  }
+    this.#tool.fillStyle = "white";
+    this.#tool.fillRect(
+      0,
+      0,
+      document.body.clientWidth,
+      document.body.clientHeight
+    );
+  };
 
   #toScreenX(xTrue) {
     return (xTrue + this.#offsetX) * this.#scale;
@@ -704,11 +770,11 @@ class Canvas {
   }
 
   #toTrueX(xScreen) {
-    return (xScreen / this.#scale) - this.#offsetX;
+    return xScreen / this.#scale - this.#offsetX;
   }
 
   #toTrueY(yScreen) {
-    return (yScreen / this.#scale) - this.#offsetY;
+    return yScreen / this.#scale - this.#offsetY;
   }
 
   #trueHeight() {
@@ -724,7 +790,11 @@ class Canvas {
     const deltaY = event.deltaY;
     const scaleAmount = -deltaY / 1000;
 
-    if ((this.#scale === 0.1 && scaleAmount < 0) || (this.#scale === 10 && scaleAmount > 0)) return;
+    if (
+      (this.#scale === 0.1 && scaleAmount < 0) ||
+      (this.#scale === 10 && scaleAmount > 0)
+    )
+      return;
 
     if (scaleAmount < 0) {
       this.#scale = Math.max(0.1, this.#scale * (1 + scaleAmount));
@@ -749,7 +819,7 @@ class Canvas {
     this.#offsetY -= unitsAddTop;
 
     this.#redrawCanvas();
-  }
+  };
 
   redo = () => {
     const nextState = this.#roomState.get(userId).next();
@@ -757,29 +827,21 @@ class Canvas {
       this.#socket.emit(SOCKET_ACTION.UNDO_OR_REDO, { type: "redo", userId });
       this.#redrawCanvas();
     }
-  }
+  };
 
   undo = () => {
     this.#roomState.get(userId).prev();
     this.#socket.emit(SOCKET_ACTION.UNDO_OR_REDO, { type: "undo", userId });
     this.#redrawCanvas();
-  }
+  };
 
   clear() {
     if (this.#isDrawingCleared) return;
-    this.#clear()
+    this.#clear();
     this.#isDrawingCleared = true;
-    this.#socket.emit(SOCKET_ACTION.CANVAS_CLEAR)
+    this.#socket.emit(SOCKET_ACTION.CANVAS_CLEAR);
   }
 }
-
-
-
-
-
-
-
-
 
 class Zoom {
   #zoomValue;
@@ -791,42 +853,40 @@ class Zoom {
       if (event.target.classList.contains("zoom-actions")) return;
       const targetClass = event.target.classList[0];
       switch (targetClass) {
-        case "zoom-in": return this.#zoomIn;
-        case "zoom-out": return this.#zoomOut;
-        default: return this.#reset();
+        case "zoom-in":
+          return this.#zoomIn;
+        case "zoom-out":
+          return this.#zoomOut;
+        default:
+          return this.#reset();
       }
     });
   }
 
-  #zoomIn = () => {
+  #zoomIn = () => {};
 
-  }
+  #zoomOut = () => {};
 
-  #zoomOut = () => {
-
-  }
-
-  #reset = () => {
-
-  }
+  #reset = () => {};
 
   update(scale) {
-    this.#zoomValue.innerText = `${(scale * 100).toFixed(0)}%`
+    this.#zoomValue.innerText = `${(scale * 100).toFixed(0)}%`;
   }
-
 }
 
 const pencil = new Pencil();
 const shape = new Shape();
 const eraser = new Eraser();
 const zoom = new Zoom();
-const canvas = new Canvas({ canvasId: ".canvas", pencil, eraser, db, shape, zoom });
-const actions = new Actions({ pencil, shape, eraser, canvas, })
-
-
-
-
-
+const canvas = new Canvas({
+  canvasId: ".canvas",
+  pencil,
+  eraser,
+  db,
+  shape,
+  zoom,
+});
+const actions = new Actions({ pencil, shape, eraser, canvas });
 
 // // // Handle cleanup action
 // // function minimizeHandling(stickyNote) {
@@ -935,9 +995,6 @@ const actions = new Actions({ pencil, shape, eraser, canvas, })
 // //     dragAndDrop(stickyNote);
 // //   })
 // // })
-
-
-
 
 // // Shape data structure
 // let shapes = [];
@@ -1077,3 +1134,42 @@ const actions = new Actions({ pencil, shape, eraser, canvas, })
 //   });
 // });
 
+const stage = new Stage({
+  container: document.querySelector(".canvas-container"),
+  width: window.innerWidth,
+  height: window.innerHeight,
+  x: 0,
+  y: 0,
+
+  // clearBeforeDraw?: boolean;
+
+  // clipX?: number;
+  // clipY?: number;
+
+  // [index: string]: any;
+  // x?: number;
+  // y?: number;
+  // width?: number;
+  // height?: number;
+  // visible?: boolean;
+  // listening?: boolean;
+  // id?: string;
+  // name?: string;
+  // opacity?: number;
+  // scale?: Vector2d;
+  // scaleX?: number;
+  // skewX?: number;
+  // skewY?: number;
+  // scaleY?: number;
+  // rotation?: number;
+  // rotationDeg?: number;
+  // offset?: Vector2d;
+  // offsetX?: number;
+  // offsetY?: number;
+  // draggable?: boolean;
+  // dragDistance?: number;
+  // dragBoundFunc?: (this: Node, pos: Vector2d) => Vector2d;
+  // preventDefault?: boolean;
+  // globalCompositeOperation?: globalCompositeOperationType;
+  // filters?: Array<Filter>;
+});

@@ -54,8 +54,10 @@ const roomState = new Map();
 const roomId_userId = new Map();
 const socketId_roomId_userId = new Map();
 
+app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/", (req, res) => {
-  return res.sendFile(path.join(__dirname, "whiteboard", "index.html"));
+  return res.sendFile(path.join(__dirname, "public", "home", "index.html"));
 });
 
 app.post("/create", function (req, res) {
@@ -92,14 +94,14 @@ app.post("/create", function (req, res) {
 app.get("/:id", function (req, res) {
   const id = req.params.id;
   if (!id || !roomIds.has(id))
-    return res.sendFile(path.join(__dirname + "/whiteboard/not-found.html"));
-  return res.sendFile(path.join(__dirname, "whiteboard", "board.html"));
+    return res.sendFile(
+      path.join(__dirname, "public", "not-found", "not-found.html")
+    );
+  return res.sendFile(path.join(__dirname, "public", "board", "board.html"));
 });
 
-app.use(express.static(path.join(__dirname, "whiteboard")));
-
 const server = app.listen(process.env.PORT || 3000, () => {
-  console.log("server start on port =", process.env.PORT || 3000);
+  console.log("server running on port", process.env.PORT || 3000);
 });
 
 const SOCKET_ACTION = {
