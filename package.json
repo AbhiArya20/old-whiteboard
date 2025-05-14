@@ -4,10 +4,6 @@
   "description": "",
   "main": "app.js",
   "type": "module",
-  "engines": {
-    "node": "22.14.0",
-    "npm": "10.9.2"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
@@ -16,6 +12,7 @@
   "author": "Abhishek kumar",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "cors": "^2.8.5",
     "express": "5.1.0",
     "nanoid": "5.1.5",

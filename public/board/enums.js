@@ -21,7 +21,7 @@ export const ACTIONS = Object.freeze({
 
 export const SOCKET_ACTION = Object.freeze({
     JOIN_ROOM: "join-room",
-    JOINED_USER_STATE: "joined-user-state",
+    JOINED_USER_STATE: "joined-users-state",
     CANVAS_START: "canvas-start",
     CANVAS_UPDATE: "canvas-update",
     CANVAS_CLEAR: "canvas-clear",

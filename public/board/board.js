@@ -1,12 +1,11 @@
-import { MOUSE_BUTTON, SOCKET_ACTION, SHAPES } from "./js/ui/enums.js";
-import { nanoid } from "./js/nanoid.js";
-import { IndexedDB } from "./js/ui/indexed-db.js";
-import { Stack } from "./js/ui/stack.js";
-import { Actions } from "./js/ui/action.js";
-import { Eraser } from "./js/ui/eraser.js";
-import { Pencil } from "./js/ui/pencil.js";
-import { Shape } from "./js/ui/shape.js";
-import { Stage } from "./js/drawing/stage.js";
+import { MOUSE_BUTTON, SOCKET_ACTION, SHAPES } from "./enums.js";
+import { nanoid } from "./nanoid.js";
+import { IndexedDB } from "./indexed-db.js";
+import { Stack } from "./stack.js";
+import { Actions } from "./action.js";
+import { Eraser } from "./eraser.js";
+import { Pencil } from "./pencil.js";
+import { Shape } from "./shape.js";
 
 // Remove context menu
 document.oncontextmenu = () => {
@@ -382,6 +381,8 @@ class Canvas {
     });
 
     this.#socket.on(SOCKET_ACTION.JOIN_ROOM, (data) => {
+      console.log(data);
+      
       const stack = new Stack();
       if (data.stack && data.stack.length) {
         stack.push(...data.state);
@@ -391,6 +392,8 @@ class Canvas {
     });
 
     this.#socket.on(SOCKET_ACTION.JOINED_USER_STATE, (data) => {
+      console.log(data);
+      
       data.forEach((userState) => {
         const stack = new Stack();
         stack.push(...userState.state);
@@ -1133,43 +1136,3 @@ const actions = new Actions({ pencil, shape, eraser, canvas });
 //     redrawCanvas();
 //   });
 // });
-
-const stage = new Stage({
-  container: document.querySelector(".canvas-container"),
-  width: window.innerWidth,
-  height: window.innerHeight,
-  x: 0,
-  y: 0,
-
-  // clearBeforeDraw?: boolean;
-
-  // clipX?: number;
-  // clipY?: number;
-
-  // [index: string]: any;
-  // x?: number;
-  // y?: number;
-  // width?: number;
-  // height?: number;
-  // visible?: boolean;
-  // listening?: boolean;
-  // id?: string;
-  // name?: string;
-  // opacity?: number;
-  // scale?: Vector2d;
-  // scaleX?: number;
-  // skewX?: number;
-  // skewY?: number;
-  // scaleY?: number;
-  // rotation?: number;
-  // rotationDeg?: number;
-  // offset?: Vector2d;
-  // offsetX?: number;
-  // offsetY?: number;
-  // draggable?: boolean;
-  // dragDistance?: number;
-  // dragBoundFunc?: (this: Node, pos: Vector2d) => Vector2d;
-  // preventDefault?: boolean;
-  // globalCompositeOperation?: globalCompositeOperationType;
-  // filters?: Array<Filter>;
-});
