@@ -30,10 +30,6 @@ export class Actions {
           return this.#handleEraser(event);
         case ACTIONS.DOWNLOAD:
           return this.#handleDownload(event);
-        case ACTIONS.IMAGE:
-          return this.#handleImage();
-        case ACTIONS.NOTE:
-          return this.#handleNote();
         case ACTIONS.REDO:
           return this.#handleRedo();
         case ACTIONS.UNDO:
@@ -92,11 +88,7 @@ export class Actions {
     a.style.backgroundColor = "white";
     a.click();
   };
-
-  #handleImage = () => {};
-
-  #handleNote = () => {};
-
+  
   #handleRedo = () => {
     this.#canvas.redo();
   };
