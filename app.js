@@ -13,7 +13,6 @@ const app = express();
 app.use(express.json());
 
 const rooms = new Map();
-const users_room = new Map();
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -73,8 +72,6 @@ const server = app.listen(process.env.PORT || 3000, () => {
 const io = new Server(server);
 
 io.on("connection", (socket) => {
-  console.log("connection");
-  
   const socketId = socket.id;
   socket.on(SOCKET_ACTION.JOIN_ROOM, (data) => {
     socket.join(data.roomId);
@@ -142,10 +139,7 @@ io.on("connection", (socket) => {
   //   console.log(data);
   // });
 
-  socket.on("disconnect", () => {
-      console.log("disconnect");
-      
-  });
+  socket.on("disconnect", () => {});
 });
 
 setInterval(() => {
@@ -156,4 +150,3 @@ setInterval(() => {
     }
   }
 }, 1000 * 60 * 60);
- 

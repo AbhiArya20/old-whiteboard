@@ -1,0 +1,30 @@
+.btn {
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  max-width: max-content;
+}
+
+.flex-center{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+svg {
+  width: 30%;
+}
+
+@media screen and (max-width: 768px) {
+  svg {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  svg {
+    width: 100%;
+  }
+}
