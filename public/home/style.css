@@ -37,27 +37,6 @@
   margin-bottom: 1.5rem;
 }
 
-.input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
-}
-
-.input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
 .note {
   display: flex;
   align-items: center;
@@ -93,6 +72,14 @@
   margin: 0 auto;
 }
 
+.feature-last {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  max-width: 64rem;
+  margin: 1.5rem auto auto auto;
+}
+
 .feature-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(4px);
@@ -126,16 +113,18 @@
 }
 
 .toast {
-  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   animation: slideIn 0.3s ease forwards;
   max-width: 24rem;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .toast.success {

@@ -7,7 +7,7 @@ const toastContainer = document.getElementById("toast-container");
 function showToast(title, message, type = "success") {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.innerHTML = `${title}</br>${message}`;
+  toast.innerHTML = `<span class="toast-title">${title}</span><span class="toast-message">${message}</span>`;
   toastContainer.appendChild(toast);
   setTimeout(() => {
     toast.style.animation = "slideOut 0.3s ease forwards";
@@ -38,16 +38,14 @@ createBtn.addEventListener("click", async () => {
       body: JSON.stringify({ name }),
     });
 
-    const { id, message, description } = await res.json();
-
-    showToast(message, description, !res.ok ? "error" : "success");
-
-    if (res.ok) {
-      window.location.assign(id);
+    if (!res.ok) {
+      showToast("Unable to create room", "Please try again later", "error");
     }
+
+    const { id } = await res.json();
+    window.location.assign(id);
   } catch (e) {
     console.log(e);
-
     showToast(
       "Unable to connect to the server",
       "Check your internet connection and try again",
@@ -67,6 +65,7 @@ joinBtn.addEventListener("click", () => {
       "Please enter a valid link",
       "error"
     );
+    return;
   }
 
   if (!id) {
