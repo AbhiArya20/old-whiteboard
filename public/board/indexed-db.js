@@ -63,7 +63,6 @@ export class IndexedDB {
         });
     }
 
-    // Get all data sorted by timestamp (insertion order)
     getAllDataSorted(userId, roomId) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.store], 'readonly');
@@ -91,8 +90,7 @@ export class IndexedDB {
             };
         });
     }
-
-    // Delete data by key
+    
     deleteData(key) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.store], 'readwrite');

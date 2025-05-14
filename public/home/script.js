@@ -2,6 +2,10 @@ const createBtn = document.getElementById("create-btn");
 const joinBtn = document.getElementById("join-btn");
 const roomName = document.getElementById("roomName");
 const roomId = document.getElementById("roomId");
+const roomOption = document.getElementById("roomOption");
+const dropdown = document.querySelector(".dropdown");
+console.log(dropdown);
+
 const toastContainer = document.getElementById("toast-container");
 
 function showToast(title, message, type = "success") {
@@ -17,13 +21,25 @@ function showToast(title, message, type = "success") {
   }, 5000);
 }
 
+roomOption.addEventListener("click", ()=>{
+  dropdown.classList.toggle("show");
+});
+
 createBtn.addEventListener("click", async () => {
   const name = roomName.value.trim();
-
   if (!name) {
     showToast(
       "Room name required",
       "Please enter a room name to create",
+      "error"
+    );
+    return;
+  }
+
+  if(name.trim().length > 15){
+    showToast(
+      "Room name too long",
+      "Please enter a room name that is less than 15 characters",
       "error"
     );
     return;

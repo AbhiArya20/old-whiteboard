@@ -22,10 +22,17 @@ app.get("/", (req, res) => {
 
 app.post("/create", function (req, res) {
   const { name } = req.body;
-  if (!name) {
+  if (!name.trim()) {
     return res.status(400).json({
       message: "Room name required",
       description: "Please enter a room name to create",
+    });
+  }
+
+  if(name.trim().length > 15){
+    return res.status(400).json({
+      message: "Room name too long",
+      description: "Please enter a room name that is less than 15 characters",
     });
   }
 

@@ -845,8 +845,8 @@ class Canvas {
     this.#socket.emit(SOCKET_ACTION.CANVAS_CLEAR);
   }
 
-  getCanvas() {
-    return this.#canvas;
+  toDataURL() {
+    return this.#canvas.toDataURL();
   }
 }
 
