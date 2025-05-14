@@ -844,6 +844,10 @@ class Canvas {
     this.#isDrawingCleared = true;
     this.#socket.emit(SOCKET_ACTION.CANVAS_CLEAR);
   }
+
+  getCanvas() {
+    return this.#canvas;
+  }
 }
 
 class Zoom {

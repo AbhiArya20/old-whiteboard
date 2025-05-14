@@ -328,7 +328,7 @@ body {
   }
 
   .actions.show {
-    height: 36rem;
+    height: 28.5rem;
   }
 
   .actions > *:nth-child(1) {
@@ -340,7 +340,7 @@ body {
       height: 0rem;
     }
     100% {
-      height: 36rem;
+      height: 28.5rem;;
     }
   }
 

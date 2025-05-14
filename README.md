@@ -13,7 +13,6 @@ A simple and functional whiteboard application that allows users to collaborate 
 - Collaboration on whiteboard
 - Basic freehand drawing
 - Import images or videos
-- Take notes
 - Download
 
 ##### Technologies used

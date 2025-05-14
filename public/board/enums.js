@@ -12,8 +12,6 @@ export const ACTIONS = Object.freeze({
     SHAPE: "shape",
     ERASER: "eraser",
     DOWNLOAD: "download",
-    IMAGE: "image",
-    NOTE: "note",
     UNDO: "undo",
     REDO: "redo",
     CLEAR: "clear"

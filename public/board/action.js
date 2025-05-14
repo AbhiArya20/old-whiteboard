@@ -81,7 +81,7 @@ export class Actions {
   };
 
   #handleDownload = () => {
-    const imageURL = this.#canvas.toDataURL();
+    const imageURL = this.#canvas.getCanvas().toDataURL();
     const a = document.createElement("a");
     a.href = imageURL;
     a.download = "image.jpg";
