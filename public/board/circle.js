@@ -9,16 +9,19 @@ export class Circle {
 
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
+    this.#tool.strokeStyle = this.#state.color;
+    this.#tool.lineWidth = this.#state.lineWidth;
     this.#tool.beginPath();
-    this.#tool.arc(
+    this.#tool.ellipse(
       this.#state.X,
       this.#state.Y,
-      this.#state.radius,
+      Math.abs(this.#state.width),
+      Math.abs(this.#state.height),
+      0,
       0,
       2 * Math.PI
     );
-    this.#tool.fillStyle = this.#state.color;
-    this.#tool.fill();
+    this.#tool.stroke();
   };
 
   getState = () => {

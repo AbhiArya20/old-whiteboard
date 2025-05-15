@@ -13,16 +13,16 @@ export class Arrow {
       this.#state.endY - this.#state.startY,
       this.#state.endX - this.#state.startX
     );
-    const arrowSize = this.#state.arrowSize || 10;
+    const arrowSize = Math.min(this.#state.lineWidth * 2.5, 0.4 * Math.sqrt(Math.pow(this.#state.endX - this.#state.startX, 2) + Math.pow(this.#state.endY - this.#state.startY, 2)));
 
     this.#tool.beginPath();
     this.#tool.moveTo(this.#state.startX, this.#state.startY);
     this.#tool.lineTo(this.#state.endX, this.#state.endY);
     this.#tool.strokeStyle = this.#state.color;
     this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineCap = "round";
     this.#tool.stroke();
 
-    // Draw the arrowhead
     this.#tool.beginPath();
     this.#tool.moveTo(this.#state.endX, this.#state.endY);
     this.#tool.lineTo(

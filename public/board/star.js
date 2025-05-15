@@ -4,32 +4,40 @@ export class Star {
 
   constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...options }; // Assume options include X, Y, radius, points, color, etc.
+    this.#state = { ...options };
   }
 
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
-    const { X, Y, radius, points, color } = this.#state;
-    const step = (Math.PI * 2) / points;
-    const outerRadius = radius;
-    const innerRadius = radius / 2;
 
+    this.#tool.save();
+
+    this.#tool.translate(0, 0);
+
+    const step = (Math.PI * 2) / this.#state.points;
+    const outerRadius = this.#state.radius;
+    const innerRadius = this.#state.radius / 2;
+
+    this.#tool.strokeStyle = this.#state.color;
+    this.#tool.lineWidth = this.#state.lineWidth;
     this.#tool.beginPath();
-    for (let i = 0; i < points; i++) {
+    for (let i = 0; i < this.#state.points; i++) {
       let angle = i * step;
       this.#tool.lineTo(
-        X + Math.cos(angle) * outerRadius,
-        Y + Math.sin(angle) * outerRadius
+        this.#state.X + Math.cos(angle) * outerRadius,
+        this.#state.Y + Math.sin(angle) * outerRadius
       );
       angle += step / 2;
       this.#tool.lineTo(
-        X + Math.cos(angle) * innerRadius,
-        Y + Math.sin(angle) * innerRadius
+        this.#state.X + Math.cos(angle) * innerRadius,
+        this.#state.Y + Math.sin(angle) * innerRadius
       );
     }
     this.#tool.closePath();
-    this.#tool.fillStyle = color;
-    this.#tool.fill();
+    this.#tool.lineJoin = "round";
+    this.#tool.stroke();
+
+    this.#tool.restore();
   };
 
   getState = () => {

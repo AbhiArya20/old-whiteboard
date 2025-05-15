@@ -1,4 +1,4 @@
-export class Rectangle {
+export class Rhombus {
   #tool;
   #state;
 
@@ -9,17 +9,23 @@ export class Rectangle {
 
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
+
+    this.#tool.save();
+
+    this.#tool.translate(this.#state.X, this.#state.Y);
+
     this.#tool.strokeStyle = this.#state.color;
     this.#tool.lineWidth = this.#state.lineWidth;
+
     this.#tool.beginPath();
-    this.#tool.roundRect(
-      this.#state.X,
-      this.#state.Y,
-      this.#state.width,
-      this.#state.height,
-      Math.max(Math.min(this.#state.width, this.#state.height) * 0.1, 5)
-    );
+    this.#tool.moveTo(0, -this.#state.height);
+    this.#tool.lineTo(this.#state.width, 0);
+    this.#tool.lineTo(0, this.#state.height);
+    this.#tool.lineTo(-this.#state.width, 0);
+    this.#tool.closePath();
+    this.#tool.lineJoin = "round";
     this.#tool.stroke();
+    this.#tool.restore();
   };
 
   getState = () => {

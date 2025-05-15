@@ -14,6 +14,7 @@ export class Line {
     this.#tool.lineTo(this.#state.endX, this.#state.endY);
     this.#tool.strokeStyle = this.#state.color;
     this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineCap = "round";
     this.#tool.stroke();
   };
 
