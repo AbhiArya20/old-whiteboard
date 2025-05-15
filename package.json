@@ -16,7 +16,9 @@
     "cors": "^2.8.5",
     "express": "5.1.0",
     "nanoid": "5.1.5",
-    "nodemon": "3.1.9",
     "socket.io": "4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "3.1.9"
   }
 }

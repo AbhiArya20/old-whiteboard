@@ -146,6 +146,11 @@
   flex: 1;
 }
 
+#roomOption{
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
 .dropdown {
   border-radius: 0.3rem;
   overflow-y: auto;

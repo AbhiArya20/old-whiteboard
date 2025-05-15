@@ -8,10 +8,10 @@ export class Actions {
   #eraser;
   #canvas;
   constructor(options) {
-    this.#canvas = options.canvas;
     this.#pencil = options.pencil;
     this.#shape = options.shape;
     this.#eraser = options.eraser;
+    this.#canvas = options.canvas;
 
     this.#actions = document.querySelector(".actions");
     this.#actions.children[1].classList.add("background-highlight");

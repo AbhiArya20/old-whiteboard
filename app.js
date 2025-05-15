@@ -29,7 +29,7 @@ app.post("/create", function (req, res) {
     });
   }
 
-  if(name.trim().length > 15){
+  if (name.trim().length > 15) {
     return res.status(400).json({
       message: "Room name too long",
       description: "Please enter a room name that is less than 15 characters",
@@ -43,6 +43,7 @@ app.post("/create", function (req, res) {
     }
 
     rooms.set(id, {
+      id: id,
       name,
       users: new Map(),
       expireAt: Date.now() * 1000 * 60 * 60 * 24 * 30, // 30 days
@@ -72,6 +73,27 @@ app.get("/:id", function (req, res) {
   return res.sendFile(path.join(__dirname, "public", "board", "board.html"));
 });
 
+app.post("/actives", async (req, res) => {
+  const { savedRooms } = req.body;
+
+  if (!savedRooms || savedRooms.length === 0) {
+    return res.status(200).json({
+      rooms: [],
+    });
+  }
+
+  const actives = [];
+  for (const room of savedRooms) {
+    if (rooms.has(room.id) && rooms.get(room.id).expireAt > Date.now()) {
+      actives.push(room);
+    }
+  }
+
+  return res.status(200).json({
+     actives,
+  });
+});
+
 const server = app.listen(process.env.PORT || 3000, () => {
   console.log("server running on port", process.env.PORT || 3000);
 });
@@ -80,6 +102,8 @@ const io = new Server(server);
 
 io.on("connection", (socket) => {
   const socketId = socket.id;
+  console.log(socketId);
+
   socket.on(SOCKET_ACTION.JOIN_ROOM, (data) => {
     socket.join(data.roomId);
 
@@ -98,12 +122,14 @@ io.on("connection", (socket) => {
         rooms.get(data.roomId)?.users?.get(socketId)
       );
 
-    socket.emit(
-      SOCKET_ACTION.JOINED_USER_STATE,
-      Array.from(rooms.get(data.roomId)?.users?.entries())?.map((userState) => {
-        return { ...userState[1], stack: userState[1]?.stack.state() };
-      })
-    );
+    socket.emit(SOCKET_ACTION.JOINED_USERS_STATE, {
+      ...rooms.get(data.roomId),
+      users: Array.from(rooms.get(data.roomId)?.users?.entries())?.map(
+        (userState) => {
+          return { ...userState[1], stack: userState[1]?.stack.state() };
+        }
+      ),
+    });
   });
 
   // socket.on(SOCKET_ACTION.CANVAS_START, (data) => {

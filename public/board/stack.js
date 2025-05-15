@@ -11,7 +11,7 @@ export class Stack {
     push(...items) {
         for (const item of items) {
             this.#stack[++this.#top] = item;
-            this.#size = this.#top + 1;;
+            this.#size = this.#top + 1;
         }
     }
 

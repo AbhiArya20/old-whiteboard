@@ -6,262 +6,31 @@ import { Actions } from "./action.js";
 import { Eraser } from "./eraser.js";
 import { Pencil } from "./pencil.js";
 import { Shape } from "./shape.js";
+import { Zoom } from "./zoom.js";
+import { Arrow } from "./arrow.js";
+import { Circle } from "./circle.js";
+import { Freehand } from "./freehand.js";
+import { Line } from "./line.js";
+import { Rectangle } from "./rectangle.js";
+import { Star } from "./star.js";
+import { Text } from "./text.js";
+import { Triangle } from "./triangle.js";
 
-// Remove context menu
 document.oncontextmenu = () => {
   return false;
 };
 
-// Get userId
-const userIdStorageKey = "user-id";
-const userId = localStorage.getItem(userIdStorageKey) ?? nanoid();
-
-// Open Database Connection
 const db = new IndexedDB("whiteboard", "actions");
+const roomsDb = new IndexedDB("rooms", "recent-rooms");
 
 try {
   await db.openDatabase();
+  await roomsDb.openDatabase();
 } catch (err) {
   console.log(err);
 }
 
-class Freehand {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options can include properties like color, lineWidth, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.startX, this.#state.startY);
-    this.#tool.lineTo(this.#state.endX, this.#state.endY);
-    this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
-    this.#tool.stroke();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Text {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assuming options include properties like color, fontSize, text, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    this.#tool.font = `${this.#state.fontSize}px ${this.#state.fontFamily}`;
-    this.#tool.fillStyle = this.#state.color;
-    this.#tool.fillText(this.#state.text, this.#state.X, this.#state.Y);
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Rectangle {
-  #tool;
-  #state;
-
-  constructor(tool, state) {
-    this.#tool = tool;
-    this.#state = { ...state }; // Initialize state with properties like X, Y, width, height, color.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    this.#tool.fillStyle = this.#state.color;
-    this.#tool.fillRect(
-      this.#state.X,
-      this.#state.Y,
-      this.#state.width,
-      this.#state.height
-    );
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Circle {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options include X, Y, radius, color, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    this.#tool.beginPath();
-    this.#tool.arc(
-      this.#state.X,
-      this.#state.Y,
-      this.#state.radius,
-      0,
-      2 * Math.PI
-    );
-    this.#tool.fillStyle = this.#state.color;
-    this.#tool.fill();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Line {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options include startX, startY, endX, endY, color, lineWidth, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.startX, this.#state.startY);
-    this.#tool.lineTo(this.#state.endX, this.#state.endY);
-    this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
-    this.#tool.stroke();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Arrow {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options include startX, startY, endX, endY, color, lineWidth, arrowSize, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    const angle = Math.atan2(
-      this.#state.endY - this.#state.startY,
-      this.#state.endX - this.#state.startX
-    );
-    const arrowSize = this.#state.arrowSize || 10;
-
-    this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.startX, this.#state.startY);
-    this.#tool.lineTo(this.#state.endX, this.#state.endY);
-    this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
-    this.#tool.stroke();
-
-    // Draw the arrowhead
-    this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.endX, this.#state.endY);
-    this.#tool.lineTo(
-      this.#state.endX - arrowSize * Math.cos(angle - Math.PI / 6),
-      this.#state.endY - arrowSize * Math.sin(angle - Math.PI / 6)
-    );
-    this.#tool.moveTo(this.#state.endX, this.#state.endY);
-    this.#tool.lineTo(
-      this.#state.endX - arrowSize * Math.cos(angle + Math.PI / 6),
-      this.#state.endY - arrowSize * Math.sin(angle + Math.PI / 6)
-    );
-    this.#tool.stroke();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Triangle {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options include X, Y, base, height, color, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    const halfBase = this.#state.base / 2;
-
-    this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.X, this.#state.Y); // Starting point (top vertex)
-    this.#tool.lineTo(
-      this.#state.X - halfBase,
-      this.#state.Y + this.#state.height
-    ); // Left vertex
-    this.#tool.lineTo(
-      this.#state.X + halfBase,
-      this.#state.Y + this.#state.height
-    ); // Right vertex
-    this.#tool.closePath();
-    this.#tool.fillStyle = this.#state.color;
-    this.#tool.fill();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
-
-class Star {
-  #state;
-  #tool;
-
-  constructor(tool, options) {
-    this.#tool = tool;
-    this.#state = { ...options }; // Assume options include X, Y, radius, points, color, etc.
-  }
-
-  draw = (state) => {
-    this.#state = { ...this.#state, ...state };
-    const { X, Y, radius, points, color } = this.#state;
-    const step = (Math.PI * 2) / points;
-    const outerRadius = radius;
-    const innerRadius = radius / 2;
-
-    this.#tool.beginPath();
-    for (let i = 0; i < points; i++) {
-      let angle = i * step;
-      this.#tool.lineTo(
-        X + Math.cos(angle) * outerRadius,
-        Y + Math.sin(angle) * outerRadius
-      );
-      angle += step / 2;
-      this.#tool.lineTo(
-        X + Math.cos(angle) * innerRadius,
-        Y + Math.sin(angle) * innerRadius
-      );
-    }
-    this.#tool.closePath();
-    this.#tool.fillStyle = color;
-    this.#tool.fill();
-  };
-
-  getState = () => {
-    return this.#state;
-  };
-}
+const userId = nanoid();
 
 class Canvas {
   #roomState;
@@ -279,6 +48,12 @@ class Canvas {
   #tool;
 
   #rectangle;
+  #circle;
+  #line;
+  #rhombus;
+  #star;
+  #triangle;
+  #arrow;
 
   #mouseButton;
   #drawingState;
@@ -313,7 +88,6 @@ class Canvas {
     this.#roomState.set(userId, new Stack());
     this.#roomId = location.pathname.slice(1);
 
-    // Initialize objects of all other classes
     this.#pencil = options.pencil;
     this.#shape = options.shape;
     this.#eraser = options.eraser;
@@ -343,7 +117,6 @@ class Canvas {
     this.#prevTouches = [null, null];
     this.#touchCount = 0;
 
-    // Event Listeners
     this.#canvas.addEventListener("mousedown", this.#startDrawing);
     this.#canvas.addEventListener("mousemove", this.#drawing);
     this.#canvas.addEventListener("mouseup", this.#endDrawing);
@@ -356,7 +129,6 @@ class Canvas {
     this.#canvas.addEventListener("touchend", this.#endDrawingTouch);
     this.#canvas.addEventListener("touchcancel", this.#endDrawingTouch);
 
-    // Draw the canvas from local indexedDB.
     (async () => {
       try {
         const state = await db.getAllDataSorted(userId, this.#roomId);
@@ -369,7 +141,6 @@ class Canvas {
       }
     })();
 
-    // Redraw the canvas when resize the window.
     window.addEventListener("resize", (event) => {
       this.#redrawCanvas();
     });
@@ -391,9 +162,14 @@ class Canvas {
       this.#redrawCanvas();
     });
 
-    this.#socket.on(SOCKET_ACTION.JOINED_USER_STATE, (data) => {
+    this.#socket.on(SOCKET_ACTION.JOINED_USERS_STATE, async (data) => {
       console.log(data);
 
+      await roomsDb.saveData({
+        id: data.id,
+        name: data.name,
+        expireAt: data.expireAt,
+      });
       data.forEach((userState) => {
         const stack = new Stack();
         stack.push(...userState.state);
@@ -402,12 +178,10 @@ class Canvas {
       this.#redrawCanvas();
     });
 
-    // Draw lines when other connected user draws anything.
     this.#socket.on(SOCKET_ACTION.CANVAS_UPDATE, (data) => {
       this.#drawStroke(data);
     });
 
-    // Update indexedDB when other connected user completes its one drawing.
     this.#socket.on(SOCKET_ACTION.UPDATE_ROOM_STATE, async (data) => {
       try {
         this.#roomState.set(data.userId, new Stack(...data.state));
@@ -422,7 +196,6 @@ class Canvas {
     });
   }
 
-  // Function to detect which mouse button is clicked.
   #getClickedMouse = (event) => {
     switch (event.button) {
       case 0:
@@ -470,10 +243,8 @@ class Canvas {
           : this.#pencil.getState().size,
       };
 
-      // Drawing
       this.#drawStroke(data);
 
-      // Storing drawing state to update indexedDB and send to others user
       this.#drawingState.userId = userId;
       this.#drawingState.roomId = this.#roomId;
       this.#drawingState.id = nanoid();
@@ -487,7 +258,6 @@ class Canvas {
         Y1: scaledY,
       });
 
-      // Emit current drawing points.
       this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, {
         X0: prevScaledX,
         Y0: prevScaledY,
@@ -556,10 +326,8 @@ class Canvas {
     this.#actionContainer.classList.remove("pointer-none");
     if (!this.#isDrawing) return;
 
-    // Push the drawing state in stack.
     this.#roomState.get(userId).push(this.#drawingState);
 
-    // Save the drawing state into indexedDB
     try {
       this.#db.saveData(this.#drawingState);
     } catch (err) {
@@ -579,13 +347,18 @@ class Canvas {
     this.#actionContainer.classList.add("pointer-none");
     this.#mouseButton = this.#getClickedMouse(event);
     if (this.#mouseButton === MOUSE_BUTTON.RIGHT) return;
-    // console.log(Date.now() - this.#prevClick);
+    console.log(Date.now() - this.#prevClick);
 
-    // if (this.#mouseButton === MOUSE_BUTTON.LEFT && this.#prevClick && !this.#isDrawing && Date.now() - this.#prevClick < 400) {
-    //   console.log("Double clicks");
-    // }
+    if (
+      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      this.#prevClick &&
+      !this.#isDrawing &&
+      Date.now() - this.#prevClick < 400
+    ) {
+      console.log("Double clicks");
+    }
 
-    // this.#prevClick = Date.now();
+    this.#prevClick = Date.now();
 
     const touch = (event.touches || [])[0] || event;
 
@@ -598,16 +371,67 @@ class Canvas {
 
     if (
       this.#mouseButton === MOUSE_BUTTON.LEFT &&
-      this.#shape.getState().isSelected &&
-      this.#shape.getState().selectedShape === SHAPES.RECTANGLE
+      this.#shape.getState().isSelected
     ) {
-      this.#rectangle = new Rectangle(this.#tool, this.#redrawCanvas, {
-        X: this.#cursorX,
-        Y: this.#cursorY,
-        width: 0,
-        height: 0,
-        color: this.#shape.getState().color,
-      });
+      if (this.#shape.getState().selectedShape === SHAPES.RECTANGLE) {
+        this.#rectangle = new Rectangle(this.#tool, {
+          X: this.#cursorX,
+          Y: this.#cursorY,
+          width: 0,
+          height: 0,
+          color: this.#shape.getState().color,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.CIRCLE) {
+        this.#circle = new Circle(this.#tool, {
+          X: this.#cursorX,
+          Y: this.#cursorY,
+          radius: 0,
+          color: this.#shape.getState().color,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.LINE) {
+        this.#line = new Line(this.#tool, {
+          startX: this.#cursorX,
+          startY: this.#cursorY,
+          endX: this.#cursorX,
+          endY: this.#cursorY,
+          color: this.#shape.getState().color,
+          lineWidth: this.#pencil.getState().size,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.ARROW) {
+        this.#arrow = new Arrow(this.#tool, {
+          startX: this.#cursorX,
+          startY: this.#cursorY,
+          endX: this.#cursorX,
+          endY: this.#cursorY,
+          color: this.#shape.getState().color,
+          lineWidth: this.#pencil.getState().size,
+          arrowSize: this.#pencil.getState().size*2,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.TRIANGLE) {
+        this.#triangle = new Triangle(this.#tool, {
+          X: this.#cursorX,
+          Y: this.#cursorY,
+          base: 0,
+          height: 0,
+          color: this.#shape.getState().color,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.RHOMBUS) {
+        this.#rhombus = new Rectangle(this.#tool, {
+          X: this.#cursorX,
+          Y: this.#cursorY,
+          base: 0,
+          height: 0,
+          color: this.#shape.getState().color,
+        });
+      } else if (this.#shape.getState().selectedShape === SHAPES.STAR) {
+        this.#star = new Star(this.#tool, {
+          X: this.#cursorX,
+          Y: this.#cursorY,
+          radius: 0,
+          points: 0,
+          color: this.#shape.getState().color,
+        });
+      }
     }
 
     if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
@@ -633,13 +457,105 @@ class Canvas {
     } else if (this.#mouseButton === MOUSE_BUTTON.LEFT) {
       if (this.#shape.getState().isSelected) {
         const selectedShape = this.#shape.getState().selectedShape;
+        console.log(selectedShape);
+
         if (selectedShape === "rectangle") {
           const data = {
             width: this.#cursorX - this.#rectangle.getState().X,
             height: this.#cursorY - this.#rectangle.getState().Y,
           };
 
+          console.log(data);
+
+          this.#redrawCanvas();
           this.#rectangle.draw(data);
+        } else if (selectedShape === "circle") {
+          const data = {
+            radius: Math.sqrt(
+              Math.pow(this.#cursorX - this.#circle.getState().X, 2) +
+                Math.pow(this.#cursorY - this.#circle.getState().Y, 2)
+            ),
+            color: this.#shape.getState().color,
+          };
+
+          this.#redrawCanvas();
+          this.#circle.draw(data);
+        } else if (selectedShape === "line") {
+          const data = {
+            endX: this.#cursorX,
+            endY: this.#cursorY,
+            color: this.#shape.getState().color,
+          };
+
+          this.#redrawCanvas();
+          this.#line.draw(data);
+        } else if (selectedShape === "arrow") {
+          const data = {
+            // startX: this.#cursorX,
+            // startY: this.#cursorY,
+            endX: this.#cursorX,
+            endY: this.#cursorY,
+            color: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().color
+              : this.#pencil.getState().color,
+            lineWidth: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().size
+              : this.#pencil.getState().size,
+            arrowSize: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().size
+              : this.#pencil.getState().size,
+          };
+
+          this.#redrawCanvas();
+          this.#arrow.draw(data);
+        } else if (selectedShape === "rhombus") {
+          const data = {
+            X: this.#cursorX,
+            Y: this.#cursorY,
+            base: this.#pencil.getState().size,
+            height: this.#pencil.getState().size,
+            color: this.#shape.getState().color,
+          };
+
+          this.#redrawCanvas();
+          this.#rhombus.draw(data);
+        }
+        else if(selectedShape === 'triangle'){ 
+          const data = {
+            base: this.#cursorX,
+            height: this.#cursorY,
+          };
+          this.#redrawCanvas();
+          this.#triangle.draw(data);
+        }else if(selectedShape === 'star'){
+          const data = {
+            radius: this.#cursorX,
+            points: 5,
+          };
+          this.#redrawCanvas();
+          this.#star.draw(data);
+        }
+        
+        
+        else if (selectedShape === "eraser") {
+          const data = {
+            X0: this.#prevCursorX,
+            Y0: this.#prevCursorY,
+            X1: this.#cursorX,
+            Y1: this.#cursorY,
+            color: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().color
+              : this.#pencil.getState().color,
+            lineWidth: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().size
+              : this.#pencil.getState().size,
+            arrowSize: this.#eraser.getState().isSelected
+              ? this.#eraser.getState().size
+              : this.#pencil.getState().size,
+          };
+
+          this.#redrawCanvas();
+          this.#arrow.draw(data);
         }
       } else {
         const data = {
@@ -726,7 +642,6 @@ class Canvas {
     this.#canvas.height = document.body.clientHeight;
 
     this.#clear();
-    // (this.#scale >= 1 ? line.width * this.#scale : line.width * this.#scale)
 
     for (let line of state) {
       for (let point of line.points) {
@@ -807,11 +722,9 @@ class Canvas {
 
     this.#zoom.update(this.#scale);
 
-    // zoom the page based on where the cursor is
     var distX = event.pageX / this.#canvas.clientWidth;
     var distY = event.pageY / this.#canvas.clientHeight;
 
-    // calculate how much we need to zoom
     const unitsZoomedX = this.#trueWidth() * scaleAmount;
     const unitsZoomedY = this.#trueHeight() * scaleAmount;
 
@@ -847,37 +760,6 @@ class Canvas {
 
   toDataURL() {
     return this.#canvas.toDataURL();
-  }
-}
-
-class Zoom {
-  #zoomValue;
-  constructor() {
-    this.zoomAction = document.querySelector(".zoom-actions");
-    this.#zoomValue = this.zoomAction.querySelector(".zoom-value");
-
-    this.zoomAction.addEventListener("click", (event) => {
-      if (event.target.classList.contains("zoom-actions")) return;
-      const targetClass = event.target.classList[0];
-      switch (targetClass) {
-        case "zoom-in":
-          return this.#zoomIn;
-        case "zoom-out":
-          return this.#zoomOut;
-        default:
-          return this.#reset();
-      }
-    });
-  }
-
-  #zoomIn = () => {};
-
-  #zoomOut = () => {};
-
-  #reset = () => {};
-
-  update(scale) {
-    this.#zoomValue.innerText = `${(scale * 100).toFixed(0)}%`;
   }
 }
 
