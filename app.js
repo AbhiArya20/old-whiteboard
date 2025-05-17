@@ -14,6 +14,8 @@ app.use(express.json());
 
 const rooms = new Map();
 
+const user_room = new Map();
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
@@ -90,7 +92,7 @@ app.post("/actives", async (req, res) => {
   }
 
   return res.status(200).json({
-     actives,
+    actives,
   });
 });
 
@@ -102,10 +104,12 @@ const io = new Server(server);
 
 io.on("connection", (socket) => {
   const socketId = socket.id;
-  console.log(socketId);
 
-  socket.on(SOCKET_ACTION.JOIN_ROOM, (data) => {
-    socket.join(data.roomId);
+  socket.emit(SOCKET_ACTION.USER_ID, socketId);
+
+  socket.on(SOCKET_ACTION.JOIN_ROOM, async (data) => {
+    await socket.join(data.roomId);
+    user_room.set(socketId, data.roomId);
 
     rooms.get(data.roomId)?.users?.set(socketId, {
       userId: socketId,
@@ -115,18 +119,21 @@ io.on("connection", (socket) => {
       stack: new Stack(),
     });
 
-    socket.broadcast
-      .to(data.roomId)
-      .emit(
-        SOCKET_ACTION.JOIN_ROOM,
-        rooms.get(data.roomId)?.users?.get(socketId)
-      );
+    socket.broadcast.to(data.roomId).emit(SOCKET_ACTION.JOIN_ROOM, {
+      ...(rooms.get(data.roomId)?.users?.get(socketId) ?? {}),
+      top: rooms.get(data.roomId)?.users?.get(socketId)?.stack?.top(),
+      stack: rooms.get(data.roomId)?.users?.get(socketId)?.stack?.state(),
+    });
 
     socket.emit(SOCKET_ACTION.JOINED_USERS_STATE, {
       ...rooms.get(data.roomId),
-      users: Array.from(rooms.get(data.roomId)?.users?.entries())?.map(
+      users: Array.from(rooms.get(data.roomId)?.users?.entries() ?? [])?.map(
         (userState) => {
-          return { ...userState[1], stack: userState[1]?.stack.state() };
+          return {
+            ...userState[1],
+            top: userState[1].stack.top(),
+            stack: userState[1]?.stack.state(),
+          };
         }
       ),
     });
@@ -148,31 +155,31 @@ io.on("connection", (socket) => {
   //     .emit(SOCKET_ACTION.UNDO_OR_REDO, data);
   // });
 
-  // socket.on(SOCKET_ACTION.CANVAS_CLEAR, () => {
-  //   socket.broadcast
-  //     .to(socketId_roomId_userId.get(socketId)?.roomId)
-  //     .emit(SOCKET_ACTION.CANVAS_CLEAR, data);
-  // });
+  socket.on(SOCKET_ACTION.CANVAS_CLEAR, () => {
+    const roomId = user_room.get(socketId);
+    
+    socket.broadcast.to(roomId).emit(SOCKET_ACTION.CANVAS_CLEAR);
+  });
 
-  // socket.on(SOCKET_ACTION.UPDATE_ROOM_STATE, (data) => {
-  //   console.log(data);
+  socket.on(SOCKET_ACTION.UPDATE_ROOM_STATE, (data) => {
+    const roomId = user_room.get(socketId);
+    rooms.get(roomId)?.users?.get(socketId)?.stack.push(data);
 
-  //   try {
-  //     const { roomId, userId } = socketId_roomId_userId.get(socketId);
-  //     roomState.get(roomId)?.get(userId)?.push(data);
-  //     socket.broadcast
-  //       .to(socketId_roomId_userId.get(socketId)?.roomId)
-  //       .emit(SOCKET_ACTION.UPDATE_ROOM_STATE, { userId, state: data });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // });
+    socket.broadcast.to(roomId).emit(SOCKET_ACTION.UPDATE_ROOM_STATE, {
+      userId: socketId,
+      state: data,
+    });
+  });
 
-  // socket.on("touchstart", (data) => {
-  //   console.log(data);
-  // });
-
-  socket.on("disconnect", () => {});
+  socket.on("disconnect", () => {
+    const roomId = user_room.get(socketId);
+    if (rooms.get(roomId)?.users?.get(socketId).isOnline) {
+      rooms.get(roomId)?.users?.set(socketId, {
+        ...rooms.get(roomId)?.users?.get(socketId),
+        isOnline: false,
+      });
+    }
+  });
 });
 
 setInterval(() => {

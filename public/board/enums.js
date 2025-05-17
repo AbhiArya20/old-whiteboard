@@ -18,6 +18,7 @@ export const ACTIONS = Object.freeze({
 });
 
 export const SOCKET_ACTION = Object.freeze({
+    USER_ID: "user-id",
     JOIN_ROOM: "join-room",
     JOINED_USERS_STATE: "joined-users-state",
     CANVAS_START: "canvas-start",
@@ -37,4 +38,5 @@ export const SHAPES = Object.freeze({
     RHOMBUS: "rhombus",
     TRIANGLE: "triangle",
     STAR: "star",
+    FREEHAND: 'freehand'
 })

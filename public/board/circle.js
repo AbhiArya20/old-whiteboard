@@ -1,10 +1,13 @@
+import { nanoid } from "./nanoid.js";
+import { SHAPES } from "./enums.js";
+
 export class Circle {
   #state;
   #tool;
 
   constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...options }; // Assume options include X, Y, radius, color, etc.
+    this.#state = { ...options, id: nanoid(), type: SHAPES.CIRCLE };
   }
 
   draw = (state) => {

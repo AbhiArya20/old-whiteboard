@@ -1,10 +1,13 @@
+import { nanoid } from "./nanoid.js";
+import { SHAPES } from "./enums.js";
+
 export class Rhombus {
   #tool;
   #state;
 
-  constructor(tool, state) {
+  constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...state };
+    this.#state = { ...options, id: nanoid(), type: SHAPES.RHOMBUS };
   }
 
   draw = (state) => {

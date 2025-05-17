@@ -1,10 +1,13 @@
+import { nanoid } from "./nanoid.js";
+import { SHAPES } from "./enums.js";
+
 export class Arrow {
   #state;
   #tool;
 
   constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...options }; // Assume options include startX, startY, endX, endY, color, lineWidth, arrowSize, etc.
+    this.#state = { ...options, id: nanoid(), type: SHAPES.ARROW };
   }
 
   draw = (state) => {
@@ -13,7 +16,14 @@ export class Arrow {
       this.#state.endY - this.#state.startY,
       this.#state.endX - this.#state.startX
     );
-    const arrowSize = Math.min(this.#state.lineWidth * 2.5, 0.4 * Math.sqrt(Math.pow(this.#state.endX - this.#state.startX, 2) + Math.pow(this.#state.endY - this.#state.startY, 2)));
+    const arrowSize = Math.min(
+      this.#state.lineWidth * 2.5,
+      0.4 *
+        Math.sqrt(
+          Math.pow(this.#state.endX - this.#state.startX, 2) +
+            Math.pow(this.#state.endY - this.#state.startY, 2)
+        )
+    );
 
     this.#tool.beginPath();
     this.#tool.moveTo(this.#state.startX, this.#state.startY);

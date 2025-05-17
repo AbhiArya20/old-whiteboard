@@ -1,10 +1,13 @@
+import { nanoid } from "./nanoid.js";
+import { SHAPES } from "./enums.js";
+
 export class Text {
   #state;
   #tool;
 
   constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...options }; // Assuming options include properties like color, fontSize, text, etc.
+    this.#state = { ...options, id: nanoid(), type: SHAPES.TEXT };
   }
 
   draw = (state) => {

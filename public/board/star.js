@@ -1,17 +1,19 @@
+import { nanoid } from "./nanoid.js";
+import { SHAPES } from "./enums.js";
+
 export class Star {
   #state;
   #tool;
 
   constructor(tool, options) {
     this.#tool = tool;
-    this.#state = { ...options };
+    this.#state = { ...options, id: nanoid(), type: SHAPES.STAR };
   }
 
   draw = (state) => {
     this.#state = { ...this.#state, ...state };
 
     this.#tool.save();
-
     this.#tool.translate(0, 0);
 
     const step = (Math.PI * 2) / this.#state.points;
