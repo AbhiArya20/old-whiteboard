@@ -126,7 +126,7 @@ joinRecent.addEventListener("click", () => {
 
 createBtn.addEventListener("click", async () => {
   const name = roomName.value.trim();
-  if (!name) {
+  if (!name.trim()) {
     showToast(
       "Room name required",
       "Please enter a room name to create",

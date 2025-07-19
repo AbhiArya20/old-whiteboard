@@ -1,5 +1,4 @@
 import { MOUSE_BUTTON, SOCKET_ACTION, SHAPES } from "./enums.js";
-import { nanoid } from "./nanoid.js";
 import { IndexedDB } from "./indexed-db.js";
 import { Stack } from "./stack.js";
 import { Actions } from "./action.js";
@@ -29,16 +28,12 @@ try {
   console.log(err);
 }
 
-const userId = nanoid();
-
 class Canvas {
   #roomState;
 
   #actionContainer;
 
   #body;
-
-  #prevClick;
 
   #prevTouches;
   #touchCount;
@@ -59,7 +54,6 @@ class Canvas {
   #userId;
 
   #mouseButton;
-  #drawingState;
 
   #cursorX;
   #cursorY;
@@ -81,6 +75,8 @@ class Canvas {
   #zoom;
 
   #roomId;
+
+  #isDialogOpen;
 
   constructor(options) {
     const SocketURL = `${location.protocol}//${location.host}`;
@@ -108,8 +104,9 @@ class Canvas {
     this.#canvas.width = window.innerWidth;
     this.#canvas.height = window.innerHeight;
 
+    this.#isDialogOpen = false;
+
     this.#mouseButton = MOUSE_BUTTON.NONE;
-    this.#drawingState = { points: [] };
 
     this.#isDrawing = false;
 
@@ -126,12 +123,12 @@ class Canvas {
     this.#canvas.addEventListener("mouseup", this.#endDrawing);
     this.#canvas.addEventListener("mouseout", this.#endDrawing);
     this.#canvas.addEventListener("wheel", this.#onMouseWheel);
-    // this.#canvas.addEventListener("touchstart", this.#startDrawingTouch);
-    // this.#canvas.addEventListener("touchmove", this.#drawingTouch, {
-    //   passive: true,
-    // });
-    // this.#canvas.addEventListener("touchend", this.#endDrawingTouch);
-    // this.#canvas.addEventListener("touchcancel", this.#endDrawingTouch);
+     this.#canvas.addEventListener("touchstart", this.#startDrawing);
+    this.#canvas.addEventListener("touchmove", this.#drawing, {
+      passive: true,
+    });
+    this.#canvas.addEventListener("touchend", this.#endDrawing);
+    this.#canvas.addEventListener("touchcancel", this.#endDrawing);
 
     window.addEventListener("resize", (event) => {
       this.#redrawCanvas();
@@ -184,17 +181,11 @@ class Canvas {
     });
 
     this.#socket.on(SOCKET_ACTION.CANVAS_UPDATE, (data) => {
-      
+
     });
 
     this.#socket.on(SOCKET_ACTION.UPDATE_ROOM_STATE, async (data) => {
-      console.log(this.#roomState.users);
-      console.log(data.userId);
-
-      console.log(this.#roomState.users?.get(data.userId));
-
       this.#roomState.users?.get(data.userId)?.stack?.push(data.state);
-
       this.#redrawCanvas();
     });
 
@@ -216,131 +207,6 @@ class Canvas {
     }
   };
 
-  // #startDrawingTouch = (event) => {
-  //   this.#pencil.close();
-  //   this.#actionContainer.classList.add("pointer-none");
-  //   this.#touchCount = event.touches.length;
-  //   this.#prevTouches[0] = event.touches[0];
-  //   this.#prevTouches[1] = event.touches[1];
-  // };
-
-  // #drawingTouch = (event) => {
-  //   event.preventDefault();
-  //   const touch0X = event.touches[0].pageX;
-  //   const touch0Y = event.touches[0].pageY;
-  //   const prevTouch0X = this.#prevTouches[0].pageX;
-  //   const prevTouch0Y = this.#prevTouches[0].pageY;
-
-  //   const scaledX = this.#toTrueX(touch0X);
-  //   const scaledY = this.#toTrueY(touch0Y);
-  //   const prevScaledX = this.#toTrueX(prevTouch0X);
-  //   const prevScaledY = this.#toTrueY(prevTouch0Y);
-
-  //   if (this.#touchCount === 1) {
-  //     const data = {
-  //       X0: prevTouch0X,
-  //       Y0: prevTouch0Y,
-  //       X1: touch0X,
-  //       Y1: touch0Y,
-  //       color: this.#eraser.getState().isSelected
-  //         ? this.#eraser.getState().color
-  //         : this.#pencil.getState().color,
-  //       width: this.#eraser.getState().isSelected
-  //         ? this.#eraser.getState().size
-  //         : this.#pencil.getState().size,
-  //     };
-
-  //     this.#drawStroke(data);
-
-  //     this.#drawingState.userId = userId;
-  //     this.#drawingState.roomId = this.#roomId;
-  //     this.#drawingState.id = nanoid();
-  //     this.#drawingState.type = "freehand";
-  //     this.#drawingState.color = data.color;
-  //     this.#drawingState.width = data.width;
-  //     this.#drawingState.points.push({
-  //       X0: prevScaledX,
-  //       Y0: prevScaledY,
-  //       X1: scaledX,
-  //       Y1: scaledY,
-  //     });
-
-  //     this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, {
-  //       X0: prevScaledX,
-  //       Y0: prevScaledY,
-  //       X1: scaledX,
-  //       Y1: scaledY,
-  //       type: this.#drawingState.type,
-  //       color: this.#drawingState.color,
-  //       width: this.#drawingState.width,
-  //       roomId: this.#drawingState.roomId,
-  //       userId: this.#drawingState.userId,
-  //     });
-
-  //     this.#isDrawing = true;
-  //     this.#isDrawingCleared = false;
-  //   } else {
-  //     const touch1X = event.touches[1].pageX;
-  //     const touch1Y = event.touches[1].pageY;
-  //     const prevTouch1X = this.#prevTouches[1].pageX;
-  //     const prevTouch1Y = this.#prevTouches[1].pageY;
-
-  //     const midX = (touch0X + touch1X) / 2;
-  //     const midY = (touch0Y + touch1Y) / 2;
-  //     const prevMidX = (prevTouch0X + prevTouch1X) / 2;
-  //     const prevMidY = (prevTouch0Y + prevTouch1Y) / 2;
-
-  //     const hypot = Math.sqrt(
-  //       Math.pow(touch0X - touch1X, 2) + Math.pow(touch0Y - touch1Y, 2)
-  //     );
-  //     const prevHypot = Math.sqrt(
-  //       Math.pow(prevTouch0X - prevTouch1X, 2) +
-  //         Math.pow(prevTouch0Y - prevTouch1Y, 2)
-  //     );
-
-  //     const zoomAmount = hypot / prevHypot;
-  //     this.#scale = this.#scale * zoomAmount;
-  //     const scaleAmount = 1 - zoomAmount;
-
-  //     const panX = midX - prevMidX;
-  //     const panY = midY - prevMidY;
-
-  //     this.#offsetX += panX / this.#scale;
-  //     this.#offsetY += panY / this.#scale;
-
-  //     const zoomRatioX = midX / this.#canvas.clientWidth;
-  //     const zoomRatioY = midY / this.#canvas.clientHeight;
-
-  //     const unitsZoomedX = this.#trueWidth() * scaleAmount;
-  //     const unitsZoomedY = this.#trueHeight() * scaleAmount;
-
-  //     const unitsAddLeft = unitsZoomedX * zoomRatioX;
-  //     const unitsAddTop = unitsZoomedY * zoomRatioY;
-
-  //     this.#offsetX += unitsAddLeft;
-  //     this.#offsetY += unitsAddTop;
-
-  //     this.#socket.emit("touchstart", "Running");
-
-  //     redrawCanvas();
-  //   }
-
-  //   this.#prevTouches[0] = event.touches[0];
-  //   this.#prevTouches[1] = event.touches[1];
-  // };
-
-  // #endDrawingTouch = (event) => {
-  //   this.#actionContainer.classList.remove("pointer-none");
-  //   if (!this.#isDrawing) return;
-
-  //   this.#roomState.get(userId).push(this.#drawingState);
-
-  //   this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, this.#drawingState);
-
-  //   this.#isDrawing = false;
-  //   this.#drawingState = { points: [] };
-  // };
-
   #startDrawing = (event) => {
     this.#pencil.closeDialog();
     this.#eraser.closeDialog();
@@ -349,20 +215,35 @@ class Canvas {
     this.#mouseButton = this.#getClickedMouse(event);
     if (this.#mouseButton === MOUSE_BUTTON.RIGHT) return;
 
-    // if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
-    //   this.#body.style.cursor = "grab";
-    //   return;
-    // }
+    if (this.#isDialogOpen) return;
+
+    if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
+      this.#body.style.cursor = "grab";
+
+      this.#offsetX += (this.#cursorX - this.#prevCursorX) / this.#scale;
+      this.#offsetY += (this.#cursorY - this.#prevCursorY) / this.#scale;
+      this.#redrawCanvas();
+
+      return;
+    }    
 
     const touch = (event.touches || [])[0] || event;
+
+    const isTouch = event.touches && event.touches.length > 0;
+
+    if(isTouch) {
+      this.#touchCount = event.touches.length;
+      this.#prevTouches = event.touches;
+    }
 
     this.#cursorX = touch.pageX;
     this.#cursorY = touch.pageY;
     this.#prevCursorX = touch.pageX;
     this.#prevCursorY = touch.pageY;
+    
 
     if (
-      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
       this.#shape.getState().isSelected
     ) {
       if (this.#shape.getState().selectedShape === SHAPES.RECTANGLE) {
@@ -428,17 +309,80 @@ class Canvas {
           lineWidth: this.#shape.getState().size,
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.TEXT) {
-        this.#text = new Text(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
-          text: "This is my text",
-          fontSize: this.#shape.getState().size,
-          fontFamily: this.#shape.getState().font,
-          color: this.#shape.getState().color,
+        this.#isDialogOpen = true;
+        const inputId = 'current-text'; 
+
+        const input = document.createElement("input");
+        input.id = inputId;
+        input.type = "text";
+        input.style.position = "absolute";
+        input.style.padding = "0";
+        input.style.margin = "0";
+        input.style.minWidth = "3rem";
+        input.style.width = "max-content";
+        input.style.backgroundColor = "transparent";
+        input.style.transform = "translate(0, -50%)";
+        input.style.top = (this.#cursorY - 10) + "px";
+        input.style.left = this.#cursorX + "px";
+        input.placeholder = "Enter text";
+        input.style.height = (this.#shape.getState().size + 10) + "px";
+        input.style.border = "none";
+        input.style.outline = "none";
+        input.style.fontSize = (this.#shape.getState().size * 1.5)  + "px";
+        input.style.fontFamily = this.#shape.getState().font;
+        input.style.color = this.#shape.getState().color;
+        input.autocomplete = "off";
+        
+        this.#body.appendChild(input);
+
+        setTimeout(() => input.focus(), 0);
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+          #${inputId}::placeholder {
+            color: ${this.#shape.getState().color} !important;
+            opacity: 0.7 !important;
+          }
+        `;
+
+        const head = document.querySelector("head");
+        head.appendChild(style);
+        
+        input.addEventListener("blur", (event) => {
+          event.preventDefault();
+          if(input.value.length>0) {            
+            this.#text = new Text(this.#tool, {
+              X: this.#cursorX,
+              Y: this.#cursorY,
+              text: input.value,
+              fontSize: (this.#shape.getState().size * 1.5),
+              fontFamily: this.#shape.getState().font,
+              color: this.#shape.getState().color,
+            });
+            this.#text.draw();const style = document.createElement('style');
+            style.innerHTML = `
+              #${inputId}::placeholder {
+                color: ${this.#shape.getState().color} !important;
+                opacity: 0.7 !important;
+              }
+            `;
+            this.#emitCurrentState();
+          }  
+          this.#actionContainer.classList.remove("pointer-none");        
+          this.#body.removeChild(input);
+          setTimeout(() => {
+            this.#isDialogOpen = false;
+          }, 500);
+        });  
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === "Escape") {
+            input.blur();
+          }
         });
       }
     } else if (
-      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
       this.#pencil.getState().isSelected
     ) {
       this.#freehand = new Freehand(this.#tool, {
@@ -451,8 +395,73 @@ class Canvas {
     }
   };
 
+  // #drawingTouch = (event) => {
+  //   event.preventDefault();
+
+  //   const touch0X = event.touches[0].pageX;
+  //   const touch0Y = event.touches[0].pageY;
+  //   const prevTouch0X = this.#prevTouches[0].pageX;
+  //   const prevTouch0Y = this.#prevTouches[0].pageY;
+
+
+  //   if (this.#touchCount === 1) {
+      
+  //   } else {
+  //     const touch1X = event.touches[1].pageX;
+  //     const touch1Y = event.touches[1].pageY;
+  //     const prevTouch1X = this.#prevTouches[1].pageX;
+  //     const prevTouch1Y = this.#prevTouches[1].pageY;
+
+  //     const midX = (touch0X + touch1X) / 2;
+  //     const midY = (touch0Y + touch1Y) / 2;
+  //     const prevMidX = (prevTouch0X + prevTouch1X) / 2;
+  //     const prevMidY = (prevTouch0Y + prevTouch1Y) / 2;
+
+  //     const hypot = Math.sqrt(
+  //       Math.pow(touch0X - touch1X, 2) + Math.pow(touch0Y - touch1Y, 2)
+  //     );
+  //     const prevHypot = Math.sqrt(
+  //       Math.pow(prevTouch0X - prevTouch1X, 2) +
+  //         Math.pow(prevTouch0Y - prevTouch1Y, 2)
+  //     );
+
+  //     const zoomAmount = hypot / prevHypot;
+  //     this.#scale = this.#scale * zoomAmount;
+  //     const scaleAmount = 1 - zoomAmount;
+
+  //     const panX = midX - prevMidX;
+  //     const panY = midY - prevMidY;
+
+  //     this.#offsetX += panX / this.#scale;
+  //     this.#offsetY += panY / this.#scale;
+
+  //     const zoomRatioX = midX / this.#canvas.clientWidth;
+  //     const zoomRatioY = midY / this.#canvas.clientHeight;
+
+  //     const unitsZoomedX = this.#trueWidth() * scaleAmount;
+  //     const unitsZoomedY = this.#trueHeight() * scaleAmount;
+
+  //     const unitsAddLeft = unitsZoomedX * zoomRatioX;
+  //     const unitsAddTop = unitsZoomedY * zoomRatioY;
+
+  //     this.#offsetX += unitsAddLeft;
+  //     this.#offsetY += unitsAddTop;
+
+  //     this.#socket.emit("touchstart", "Running");
+
+  //     redrawCanvas();
+  //   }
+
+  //   this.#prevTouches[0] = event.touches[0];
+  //   this.#prevTouches[1] = event.touches[1];
+  // };
+
   #drawing = (event) => {
+    if(this.#isDialogOpen || this.#shape.getState().selectedShape === SHAPES.TEXT) return;
+
     const touch = (event.touches || [])[0] || event;
+
+    const isTouch = event.touches && event.touches.length > 0;
 
     this.#cursorX = touch.pageX;
     this.#cursorY = touch.pageY;
@@ -470,7 +479,7 @@ class Canvas {
     }
 
     if (
-      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
       this.#shape.getState().isSelected
     ) {
       const selectedShape = this.#shape.getState().selectedShape;
@@ -517,13 +526,9 @@ class Canvas {
           points: 5,
         };
         this.#star.draw(data);
-      } else if (selectedShape === SHAPES.TEXT) {
-        this.#text.draw();
       }
-
-      // TODO: Make eraser to remove the entire shape
     } else if (
-      this.#mouseButton === MOUSE_BUTTON.LEFT &&
+      (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
       this.#pencil.getState().isSelected
     ) {
       const data = {
@@ -531,29 +536,9 @@ class Canvas {
         Y: this.#cursorY,
       };
       this.#freehand.draw(data);
-
-      // this.#drawingState.scale = this.#scale;
-      // this.#drawingState.points.push({
-      //   X0: prevScaledX,
-      //   Y0: prevScaledY,
-      //   X1: scaledX,
-      //   Y1: scaledY,
-      // });
-
-      // this.#socket.emit(SOCKET_ACTION.CANVAS_UPDATE, {
-      //   X0: prevScaledX,
-      //   Y0: prevScaledY,
-      //   X1: scaledX,
-      //   Y1: scaledY,
-      //   type: this.#drawingState.type,
-      //   color: this.#drawingState.color,
-      //   width: this.#drawingState.width,
-      //   roomId: this.#drawingState.roomId,
-      //   userId: this.#drawingState.userId,
-      // });
     }
 
-    if (this.#mouseButton === MOUSE_BUTTON.LEFT) {
+    if (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) {
       this.#isDrawing = true;
       this.#isDrawingCleared = false;
     }
@@ -587,14 +572,23 @@ class Canvas {
   };
 
   #endDrawing = (event) => {
+    if(this.#isDialogOpen || this.#shape.getState().selectedShape === SHAPES.TEXT) return;
+    
     this.#actionContainer.classList.remove("pointer-none");
     this.#mouseButton = MOUSE_BUTTON.NONE;
 
     this.#body.style.cursor = "crosshair";
 
     if (!this.#isDrawing) return;
+  
+    this.#emitCurrentState();
+  
+    this.#isDrawing = false;
+  };
 
+  #emitCurrentState = () =>{
     const state = this.#getCurrentState();
+    
     state.roomId = this.#roomId;
     state.userId = this.#userId;
     this.#clearCurrentState();
@@ -602,9 +596,7 @@ class Canvas {
     this.#roomState.users?.get(this.#userId)?.stack.push(state);
 
     this.#socket.emit(SOCKET_ACTION.UPDATE_ROOM_STATE, state);
-
-    this.#isDrawing = false;
-  };
+  }
 
   #redrawCanvas() {
     this.#canvas.width = document.body.clientWidth;
@@ -639,7 +631,7 @@ class Canvas {
           text.draw(state);
         } else if (state.type === SHAPES.FREEHAND) {
           const freehand = new Freehand(this.#tool, {});
-          freehand.drawPoints(state);
+          freehand.drawPoints({...state, offsetX: this.#offsetX, offsetY: this.#offsetY});
         }
       });
     });

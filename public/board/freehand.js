@@ -38,4 +38,6 @@ export class Freehand {
   getState = () => {
     return this.#state;
   };
+
+  
 }

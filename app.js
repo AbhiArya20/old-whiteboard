@@ -66,12 +66,12 @@ app.post("/create", function (req, res) {
 
 app.get("/:id", function (req, res) {
   const id = req.params.id;
-  if (!id || !rooms.has(id))
+  if (!id.trim() || !rooms.has(id.trim()))
     return res.sendFile(
       path.join(__dirname, "public", "not-found", "not-found.html")
     );
 
-  rooms.get(id).expireAt = Date.now() * 1000 * 60 * 60 * 24 * 30; // 30 days
+  rooms.get(id.trim()).expireAt = Date.now() * 1000 * 60 * 60 * 24 * 30; // 30 days
   return res.sendFile(path.join(__dirname, "public", "board", "board.html"));
 });
 
@@ -101,6 +101,30 @@ const server = app.listen(process.env.PORT || 3000, () => {
 });
 
 const io = new Server(server);
+
+/**
+ * Rooms structure  
+ * 
+ * rooms: {
+ *   roomId: {
+ *     id: roomId,
+ *     name: roomName,
+ *     expireAt: Date.now() * 1000 * 60 * 60 * 24 * 30, // 30 days
+ *     users: {
+ *       userId: {
+ *         userId: userId,
+ *         name: userName,
+ *         color: userColor,
+ *         isOnline: true,
+ *         stack: new Stack(),
+ *       }
+ *     }  
+ *   }
+ * }
+ * 
+ * 
+ */
+
 
 io.on("connection", (socket) => {
   const socketId = socket.id;
@@ -149,15 +173,14 @@ io.on("connection", (socket) => {
   //     .emit(SOCKET_ACTION.CANVAS_UPDATE, data);
   // });
 
-  // socket.on(SOCKET_ACTION.UNDO_OR_REDO, (data) => {
-  //   socket.broadcast
-  //     .to(socketId_roomId.get(socketId))
-  //     .emit(SOCKET_ACTION.UNDO_OR_REDO, data);
-  // });
+  socket.on(SOCKET_ACTION.UNDO_OR_REDO, (data) => {
+    socket.broadcast
+      .to(socketId_roomId.get(socketId))
+      .emit(SOCKET_ACTION.UNDO_OR_REDO, data);
+  });
 
   socket.on(SOCKET_ACTION.CANVAS_CLEAR, () => {
     const roomId = user_room.get(socketId);
-    
     socket.broadcast.to(roomId).emit(SOCKET_ACTION.CANVAS_CLEAR);
   });
 

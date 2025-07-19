@@ -18,7 +18,9 @@ export class Zoom {
     });
   }
 
-  #zoomIn = () => {};
+  #zoomIn = () => {
+    
+  };
 
   #zoomOut = () => {};
 
