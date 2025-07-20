@@ -602,6 +602,7 @@ class Canvas {
     this.#canvas.width = document.body.clientWidth;
     this.#canvas.height = document.body.clientHeight;
     this.#clear();
+    
 
     this.#roomState.users?.forEach((userState) => {
       userState.stack.state().forEach((state) => {
