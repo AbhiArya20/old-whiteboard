@@ -5,7 +5,6 @@ import { Actions } from "./action.js";
 import { Eraser } from "./eraser.js";
 import { Pencil } from "./pencil.js";
 import { Shape } from "./shape.js";
-import { Zoom } from "./zoom.js";
 import { Arrow } from "./arrow.js";
 import { Circle } from "./circle.js";
 import { Freehand } from "./freehand.js";
@@ -100,7 +99,6 @@ class Canvas {
   #shape;
   #eraser;
   #socket;
-  #zoom;
 
   #roomId;
 
@@ -120,7 +118,6 @@ class Canvas {
     this.#pencil = options.pencil;
     this.#shape = options.shape;
     this.#eraser = options.eraser;
-    this.#zoom = options.zoom;
 
     this.#body = document.querySelector("body");
     this.#body.style.cursor = "crosshair";
@@ -728,8 +725,6 @@ class Canvas {
       this.#scale = Math.min(10, this.#scale * (1 + scaleAmount));
     }
 
-    this.#zoom.update(this.#scale);
-
     var distX = event.pageX / this.#canvas.clientWidth;
     var distY = event.pageY / this.#canvas.clientHeight;
 
@@ -774,12 +769,10 @@ class Canvas {
 const pencil = new Pencil();
 const shape = new Shape();
 const eraser = new Eraser();
-const zoom = new Zoom();
 const canvas = new Canvas({
   canvasId: ".canvas",
   pencil,
   eraser,
   shape,
-  zoom,
 });
 const actions = new Actions({ pencil, shape, eraser, canvas });
