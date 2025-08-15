@@ -10,13 +10,13 @@ export class Line {
     this.#state = { ...options, id: nanoid(), type: SHAPES.LINE };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
     this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.startX, this.#state.startY);
-    this.#tool.lineTo(this.#state.endX, this.#state.endY);
+    this.#tool.moveTo(toScreenX(this.#state.startX), toScreenY(this.#state.startY));
+    this.#tool.lineTo(toScreenX(this.#state.endX), toScreenY(this.#state.endY));
     this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineWidth = this.#state.lineWidth * (scale || 1);
     this.#tool.lineCap = "round";
     this.#tool.stroke();
   };

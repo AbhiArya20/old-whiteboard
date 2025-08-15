@@ -29,6 +29,34 @@ try {
 }
 
 class Canvas {
+  #drawGrid() {
+    const gridSize = 100;
+    const width = this.#canvas.width;
+    const height = this.#canvas.height;
+    const ctx = this.#tool;
+
+    ctx.save();
+    ctx.strokeStyle = "#eee";
+    ctx.lineWidth = 1;
+
+    // Find top-left in virtual coordinates
+    const startX = Math.floor(this.#toTrueX(0) / gridSize) * gridSize;
+    const startY = Math.floor(this.#toTrueY(0) / gridSize) * gridSize;
+
+    for (let x = startX; this.#toScreenX(x) < width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(this.#toScreenX(x), 0);
+      ctx.lineTo(this.#toScreenX(x), height);
+      ctx.stroke();
+    }
+    for (let y = startY; this.#toScreenY(y) < height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, this.#toScreenY(y));
+      ctx.lineTo(width, this.#toScreenY(y));
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
   #roomState;
 
   #actionContainer;
@@ -217,30 +245,28 @@ class Canvas {
 
     if (this.#isDialogOpen) return;
 
-    if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
-      this.#body.style.cursor = "grab";
-
-      this.#offsetX += (this.#cursorX - this.#prevCursorX) / this.#scale;
-      this.#offsetY += (this.#cursorY - this.#prevCursorY) / this.#scale;
-      this.#redrawCanvas();
-
-      return;
-    }    
-
     const touch = (event.touches || [])[0] || event;
-
     const isTouch = event.touches && event.touches.length > 0;
-
     if(isTouch) {
       this.#touchCount = event.touches.length;
       this.#prevTouches = event.touches;
     }
 
+    // Always use virtual coordinates for infinite canvas
+    const trueX = this.#toTrueX(touch.pageX);
+    const trueY = this.#toTrueY(touch.pageY);
     this.#cursorX = touch.pageX;
     this.#cursorY = touch.pageY;
     this.#prevCursorX = touch.pageX;
     this.#prevCursorY = touch.pageY;
-    
+
+    if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
+      this.#body.style.cursor = "grab";
+      this.#offsetX += (this.#cursorX - this.#prevCursorX) / this.#scale;
+      this.#offsetY += (this.#cursorY - this.#prevCursorY) / this.#scale;
+      this.#redrawCanvas();
+      return;
+    }
 
     if (
       (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
@@ -248,43 +274,43 @@ class Canvas {
     ) {
       if (this.#shape.getState().selectedShape === SHAPES.RECTANGLE) {
         this.#rectangle = new Rectangle(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
-          width: 0,
+          X: trueX,
+          Y: trueY,
+          width: 0, 
           height: 0,
           color: this.#shape.getState().color,
           lineWidth: this.#shape.getState().size,
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.CIRCLE) {
         this.#circle = new Circle(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
+          X: trueX,
+          Y: trueY,
           radius: 0,
           color: this.#shape.getState().color,
           lineWidth: this.#shape.getState().size,
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.LINE) {
         this.#line = new Line(this.#tool, {
-          startX: this.#cursorX,
-          startY: this.#cursorY,
-          endX: this.#cursorX,
-          endY: this.#cursorY,
+          startX: trueX,
+          startY: trueY,
+          endX: trueX,
+          endY: trueY,
           color: this.#shape.getState().color,
           lineWidth: this.#shape.getState().size,
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.ARROW) {
         this.#arrow = new Arrow(this.#tool, {
-          startX: this.#cursorX,
-          startY: this.#cursorY,
-          endX: this.#cursorX,
-          endY: this.#cursorY,
+          startX: trueX,
+          startY: trueY,
+          endX: trueX,
+          endY: trueY,
           color: this.#shape.getState().color,
           lineWidth: this.#shape.getState().size,
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.RHOMBUS) {
         this.#rhombus = new Rhombus(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
+          X: trueX,
+          Y: trueY,
           width: 0,
           height: 0,
           color: this.#shape.getState().color,
@@ -292,8 +318,8 @@ class Canvas {
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.TRIANGLE) {
         this.#triangle = new Triangle(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
+          X: trueX,
+          Y: trueY,
           width: 0,
           height: 0,
           color: this.#shape.getState().color,
@@ -301,8 +327,8 @@ class Canvas {
         });
       } else if (this.#shape.getState().selectedShape === SHAPES.STAR) {
         this.#star = new Star(this.#tool, {
-          X: this.#cursorX,
-          Y: this.#cursorY,
+          X: trueX,
+          Y: trueY,
           radius: 0,
           points: 0,
           color: this.#shape.getState().color,
@@ -352,8 +378,8 @@ class Canvas {
           event.preventDefault();
           if(input.value.length>0) {            
             this.#text = new Text(this.#tool, {
-              X: this.#cursorX,
-              Y: this.#cursorY,
+              X: trueX,
+              Y: trueY,
               text: input.value,
               fontSize: (this.#shape.getState().size * 1.5),
               fontFamily: this.#shape.getState().font,
@@ -386,11 +412,11 @@ class Canvas {
       this.#pencil.getState().isSelected
     ) {
       this.#freehand = new Freehand(this.#tool, {
-        startX: this.#cursorX,
-        startY: this.#cursorY,
+        startX: trueX,
+        startY: trueY,
         color: this.#pencil.getState().color,
         lineWidth: this.#pencil.getState().size,
-        points: [{ X: this.#cursorX, Y: this.#cursorY }],
+        points: [{ X: trueX, Y: trueY }],
       });
     }
   };
@@ -460,21 +486,23 @@ class Canvas {
     if(this.#isDialogOpen || this.#shape.getState().selectedShape === SHAPES.TEXT) return;
 
     const touch = (event.touches || [])[0] || event;
-
     const isTouch = event.touches && event.touches.length > 0;
+
+    // Always use virtual coordinates for infinite canvas
+    const trueX = this.#toTrueX(touch.pageX);
+    const trueY = this.#toTrueY(touch.pageY);
+    const prevTrueX = this.#toTrueX(this.#prevCursorX);
+    const prevTrueY = this.#toTrueY(this.#prevCursorY);
 
     this.#cursorX = touch.pageX;
     this.#cursorY = touch.pageY;
-
-    const scaledX = this.#toTrueX(this.#cursorX);
-    const scaledY = this.#toTrueY(this.#cursorY);
-    const prevScaledX = this.#toTrueX(this.#prevCursorX);
-    const prevScaledY = this.#toTrueY(this.#prevCursorY);
 
     if (this.#mouseButton === MOUSE_BUTTON.MIDDLE) {
       this.#offsetX += (this.#cursorX - this.#prevCursorX) / this.#scale;
       this.#offsetY += (this.#cursorY - this.#prevCursorY) / this.#scale;
       this.#redrawCanvas();
+      this.#prevCursorX = this.#cursorX;
+      this.#prevCursorY = this.#cursorY;
       return;
     }
 
@@ -484,58 +512,64 @@ class Canvas {
     ) {
       const selectedShape = this.#shape.getState().selectedShape;
       this.#redrawCanvas();
+      const toScreenX = this.#toScreenX.bind(this);
+      const toScreenY = this.#toScreenY.bind(this);
+      const scale = this.#scale;
       if (selectedShape === SHAPES.RECTANGLE) {
         const data = {
-          width: this.#cursorX - this.#rectangle.getState().X,
-          height: this.#cursorY - this.#rectangle.getState().Y,
+          width: trueX - this.#rectangle.getState().X,
+          height: trueY - this.#rectangle.getState().Y,
         };
-        this.#rectangle.draw(data);
+        this.#rectangle.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.CIRCLE) {
         const data = {
-          width: this.#cursorX - this.#circle.getState().X,
-          height: this.#cursorY - this.#circle.getState().Y,
+          width: trueX - this.#circle.getState().X,
+          height: trueY - this.#circle.getState().Y,
         };
-        this.#circle.draw(data);
+        this.#circle.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.LINE) {
         const data = {
-          endX: this.#cursorX,
-          endY: this.#cursorY,
+          endX: trueX,
+          endY: trueY,
         };
-        this.#line.draw(data);
+        this.#line.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.ARROW) {
         const data = {
-          endX: this.#cursorX,
-          endY: this.#cursorY,
+          endX: trueX,
+          endY: trueY,
         };
-        this.#arrow.draw(data);
+        this.#arrow.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.RHOMBUS) {
         const data = {
-          width: this.#cursorX - this.#rhombus.getState().X,
-          height: this.#cursorY - this.#rhombus.getState().Y,
+          width: trueX - this.#rhombus.getState().X,
+          height: trueY - this.#rhombus.getState().Y,
         };
-        this.#rhombus.draw(data);
+        this.#rhombus.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.TRIANGLE) {
         const data = {
-          width: this.#cursorX - this.#triangle.getState().X,
-          height: this.#cursorY - this.#triangle.getState().Y,
+          width: trueX - this.#triangle.getState().X,
+          height: trueY - this.#triangle.getState().Y,
         };
-        this.#triangle.draw(data);
+        this.#triangle.draw(data, toScreenX, toScreenY, scale);
       } else if (selectedShape === SHAPES.STAR) {
         const data = {
-          radius: this.#cursorX - this.#star.getState().X,
+          radius: trueX - this.#star.getState().X,
           points: 5,
         };
-        this.#star.draw(data);
+        this.#star.draw(data, toScreenX, toScreenY, scale);
       }
     } else if (
       (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) &&
       this.#pencil.getState().isSelected
     ) {
       const data = {
-        X: this.#cursorX,
-        Y: this.#cursorY,
+        X: trueX,
+        Y: trueY,
       };
-      this.#freehand.draw(data);
+      const toScreenX = this.#toScreenX.bind(this);
+      const toScreenY = this.#toScreenY.bind(this);
+      const scale = this.#scale;
+      this.#freehand.draw(data, toScreenX, toScreenY, scale);
     }
 
     if (this.#mouseButton === MOUSE_BUTTON.LEFT || isTouch) {
@@ -602,37 +636,41 @@ class Canvas {
     this.#canvas.width = document.body.clientWidth;
     this.#canvas.height = document.body.clientHeight;
     this.#clear();
-    
+    // Draw grid for infinite canvas
+    this.#drawGrid();
 
     this.#roomState.users?.forEach((userState) => {
       userState.stack.state().forEach((state) => {
+        const toScreenX = this.#toScreenX.bind(this);
+        const toScreenY = this.#toScreenY.bind(this);
+        const scale = this.#scale;
         if (state.type === SHAPES.RECTANGLE) {
           const rectangle = new Rectangle(this.#tool, {});
-          rectangle.draw(state);
+          rectangle.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.CIRCLE) {
           const circle = new Circle(this.#tool, {});
-          circle.draw(state);
+          circle.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.LINE) {
           const line = new Line(this.#tool, {});
-          line.draw(state);
+          line.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.ARROW) {
           const arrow = new Arrow(this.#tool, {});
-          arrow.draw(state);
+          arrow.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.RHOMBUS) {
           const rhombus = new Rhombus(this.#tool, {});
-          rhombus.draw(state);
+          rhombus.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.TRIANGLE) {
           const triangle = new Triangle(this.#tool, {});
-          triangle.draw(state);
+          triangle.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.STAR) {
           const star = new Star(this.#tool, {});
-          star.draw(state);
+          star.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.TEXT) {
           const text = new Text(this.#tool, {});
-          text.draw(state);
+          text.draw(state, toScreenX, toScreenY, scale);
         } else if (state.type === SHAPES.FREEHAND) {
           const freehand = new Freehand(this.#tool, {});
-          freehand.drawPoints({...state, offsetX: this.#offsetX, offsetY: this.#offsetY});
+          freehand.drawPoints({...state, offsetX: this.#offsetX, offsetY: this.#offsetY}, toScreenX, toScreenY, scale);
         }
       });
     });

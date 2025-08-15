@@ -10,39 +10,36 @@ export class Arrow {
     this.#state = { ...options, id: nanoid(), type: SHAPES.ARROW };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
-    const angle = Math.atan2(
-      this.#state.endY - this.#state.startY,
-      this.#state.endX - this.#state.startX
-    );
+    const sx = toScreenX(this.#state.startX);
+    const sy = toScreenY(this.#state.startY);
+    const ex = toScreenX(this.#state.endX);
+    const ey = toScreenY(this.#state.endY);
+    const angle = Math.atan2(ey - sy, ex - sx);
     const arrowSize = Math.min(
-      this.#state.lineWidth * 2.5,
-      0.4 *
-        Math.sqrt(
-          Math.pow(this.#state.endX - this.#state.startX, 2) +
-            Math.pow(this.#state.endY - this.#state.startY, 2)
-        )
+      this.#state.lineWidth * 2.5 * (scale || 1),
+      0.4 * Math.sqrt(Math.pow(ex - sx, 2) + Math.pow(ey - sy, 2))
     );
 
     this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.startX, this.#state.startY);
-    this.#tool.lineTo(this.#state.endX, this.#state.endY);
+    this.#tool.moveTo(sx, sy);
+    this.#tool.lineTo(ex, ey);
     this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineWidth = this.#state.lineWidth * (scale || 1);
     this.#tool.lineCap = "round";
     this.#tool.stroke();
 
     this.#tool.beginPath();
-    this.#tool.moveTo(this.#state.endX, this.#state.endY);
+    this.#tool.moveTo(ex, ey);
     this.#tool.lineTo(
-      this.#state.endX - arrowSize * Math.cos(angle - Math.PI / 6),
-      this.#state.endY - arrowSize * Math.sin(angle - Math.PI / 6)
+      ex - arrowSize * Math.cos(angle - Math.PI / 6),
+      ey - arrowSize * Math.sin(angle - Math.PI / 6)
     );
-    this.#tool.moveTo(this.#state.endX, this.#state.endY);
+    this.#tool.moveTo(ex, ey);
     this.#tool.lineTo(
-      this.#state.endX - arrowSize * Math.cos(angle + Math.PI / 6),
-      this.#state.endY - arrowSize * Math.sin(angle + Math.PI / 6)
+      ex - arrowSize * Math.cos(angle + Math.PI / 6),
+      ey - arrowSize * Math.sin(angle + Math.PI / 6)
     );
     this.#tool.stroke();
   };

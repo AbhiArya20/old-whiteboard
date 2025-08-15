@@ -10,17 +10,21 @@ export class Rectangle {
     this.#state = { ...options, id: nanoid(), type: SHAPES.RECTANGLE };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
     this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineWidth = this.#state.lineWidth * (scale || 1);
     this.#tool.beginPath();
+    const x = toScreenX(this.#state.X);
+    const y = toScreenY(this.#state.Y);
+    const w = this.#state.width * (scale || 1);
+    const h = this.#state.height * (scale || 1);
     this.#tool.roundRect(
-      this.#state.X,
-      this.#state.Y,
-      this.#state.width,
-      this.#state.height,
-      Math.max(Math.min(this.#state.width, this.#state.height) * 0.1, 5)
+      x,
+      y,
+      w,
+      h,
+      Math.max(Math.min(w, h) * 0.1, 5)
     );
     this.#tool.stroke();
   };

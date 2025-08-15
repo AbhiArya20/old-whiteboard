@@ -10,11 +10,11 @@ export class Text {
     this.#state = { ...options, id: nanoid(), type: SHAPES.TEXT };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
-    this.#tool.font = `${this.#state.fontSize}px ${this.#state.fontFamily}`;
+    this.#tool.font = `${this.#state.fontSize * (scale || 1)}px ${this.#state.fontFamily}`;
     this.#tool.fillStyle = this.#state.color;
-    this.#tool.fillText(this.#state.text, this.#state.X, this.#state.Y);
+    this.#tool.fillText(this.#state.text, toScreenX(this.#state.X), toScreenY(this.#state.Y));
   };
 
   getState = () => {

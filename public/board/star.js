@@ -10,35 +10,32 @@ export class Star {
     this.#state = { ...options, id: nanoid(), type: SHAPES.STAR };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
-
     this.#tool.save();
-    this.#tool.translate(0, 0);
-
+    const x = toScreenX(this.#state.X);
+    const y = toScreenY(this.#state.Y);
+    const outerRadius = this.#state.radius * (scale || 1);
+    const innerRadius = outerRadius / 2;
     const step = (Math.PI * 2) / this.#state.points;
-    const outerRadius = this.#state.radius;
-    const innerRadius = this.#state.radius / 2;
-
     this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
+    this.#tool.lineWidth = this.#state.lineWidth * (scale || 1);
     this.#tool.beginPath();
     for (let i = 0; i < this.#state.points; i++) {
       let angle = i * step;
       this.#tool.lineTo(
-        this.#state.X + Math.cos(angle) * outerRadius,
-        this.#state.Y + Math.sin(angle) * outerRadius
+        x + Math.cos(angle) * outerRadius,
+        y + Math.sin(angle) * outerRadius
       );
       angle += step / 2;
       this.#tool.lineTo(
-        this.#state.X + Math.cos(angle) * innerRadius,
-        this.#state.Y + Math.sin(angle) * innerRadius
+        x + Math.cos(angle) * innerRadius,
+        y + Math.sin(angle) * innerRadius
       );
     }
     this.#tool.closePath();
     this.#tool.lineJoin = "round";
     this.#tool.stroke();
-
     this.#tool.restore();
   };
 

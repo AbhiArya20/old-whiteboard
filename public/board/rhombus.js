@@ -10,21 +10,21 @@ export class Rhombus {
     this.#state = { ...options, id: nanoid(), type: SHAPES.RHOMBUS };
   }
 
-  draw = (state) => {
+  draw = (state, toScreenX, toScreenY, scale) => {
     this.#state = { ...this.#state, ...state };
-
     this.#tool.save();
-
-    this.#tool.translate(this.#state.X, this.#state.Y);
-
+    const x = toScreenX(this.#state.X);
+    const y = toScreenY(this.#state.Y);
+    const w = this.#state.width * (scale || 1);
+    const h = this.#state.height * (scale || 1);
+    this.#tool.translate(x, y);
     this.#tool.strokeStyle = this.#state.color;
-    this.#tool.lineWidth = this.#state.lineWidth;
-
+    this.#tool.lineWidth = this.#state.lineWidth * (scale || 1);
     this.#tool.beginPath();
-    this.#tool.moveTo(0, -this.#state.height);
-    this.#tool.lineTo(this.#state.width, 0);
-    this.#tool.lineTo(0, this.#state.height);
-    this.#tool.lineTo(-this.#state.width, 0);
+    this.#tool.moveTo(0, -h);
+    this.#tool.lineTo(w, 0);
+    this.#tool.lineTo(0, h);
+    this.#tool.lineTo(-w, 0);
     this.#tool.closePath();
     this.#tool.lineJoin = "round";
     this.#tool.stroke();
